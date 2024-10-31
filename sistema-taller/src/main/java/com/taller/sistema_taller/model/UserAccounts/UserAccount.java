@@ -2,13 +2,13 @@ package com.taller.sistema_taller.model.UserAccounts;
 
 public class UserAccount {
     private final Long userId;
-    private String name;
+    private String userName;
     private String phone;
     private final AccessCredentials accessCredentials;
 
-    public UserAccount(Long userId, String name, String phone, AccessCredentials accessCredentials) {
+    public UserAccount(Long userId, String userName, String phone, AccessCredentials accessCredentials) {
         this.userId = userId;
-        this.name = name;
+        this.userName = userName;
         this.phone = phone;
         this.accessCredentials = accessCredentials;
     }
@@ -17,16 +17,16 @@ public class UserAccount {
         this.phone = newPhone;
     }
 
-    public String getName() {
-        return name;
+    public String getUserName() {
+        return userName;
     }
 
     public String getPhone() {
         return phone;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUserName(String name) {
+        this.userName = name;
     }
 
     public void setPhone(String phone) {

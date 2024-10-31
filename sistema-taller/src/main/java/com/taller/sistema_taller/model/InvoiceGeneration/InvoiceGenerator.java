@@ -36,7 +36,7 @@ public class InvoiceGenerator {
             // Detalles del cliente
             Font subHeaderFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14);
             document.add(new Paragraph("Client Details:", subHeaderFont));
-            document.add(new Paragraph("Name: " + invoice.getClient().getName(), regularFont));
+            document.add(new Paragraph("Name: " + invoice.getClient().getUserName(), regularFont));
             document.add(new Paragraph("Email: " + invoice.getClient().getAccessCredentials().getEmail(), regularFont));
 
             // Detalles del vehículo
