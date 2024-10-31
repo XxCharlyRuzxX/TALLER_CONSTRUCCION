@@ -46,7 +46,7 @@ public class UserService implements UserServiceInterface {
     public UserAccount updateUser(Long id, UserDTO userDto) {
         UserAccount existingUser = userDatabase.get(id);
         if (existingUser != null) {
-            existingUser.setName(userDto.getName());
+            existingUser.setUserName(userDto.getName());
             existingUser.setPhone(userDto.getPhone());
             existingUser.getAccessCredentials().setEmail(userDto.getEmail());
             existingUser.getAccessCredentials().setPassword(userDto.getPassword());
