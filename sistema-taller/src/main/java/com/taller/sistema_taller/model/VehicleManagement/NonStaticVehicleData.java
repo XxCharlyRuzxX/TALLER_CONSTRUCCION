@@ -1,12 +1,12 @@
 
 package com.taller.sistema_taller.model.VehicleManagement;
 
-public class DynamicVehicleData {
+public class NonStaticVehicleData {
     private int mileage;
     private float fuelLevel;
     private String additionalObservations;
 
-    public DynamicVehicleData(int mileage, float fuelLevel, String additionalObservations) {
+    public NonStaticVehicleData(int mileage, float fuelLevel, String additionalObservations) {
         this.mileage = mileage;
         this.fuelLevel = fuelLevel;
         this.additionalObservations = additionalObservations;

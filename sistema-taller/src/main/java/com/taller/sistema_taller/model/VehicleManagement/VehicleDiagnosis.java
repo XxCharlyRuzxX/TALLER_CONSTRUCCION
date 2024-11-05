@@ -1,6 +1,8 @@
 package com.taller.sistema_taller.model.VehicleManagement;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class VehicleDiagnosis {
     private Long idDiagnosis;
@@ -8,12 +10,14 @@ public class VehicleDiagnosis {
     private float maintenanceCost;
     private Date evaluationDate;
     private boolean isAuthorized;
+    private List<PartDiagnosis> partsList;
 
     public VehicleDiagnosis(String problemDetail, float maintenanceCost, Date evaluationDate) {
         this.problemDetail = problemDetail;
         this.maintenanceCost = maintenanceCost;
         this.evaluationDate = evaluationDate;
         this.isAuthorized = false;
+        this.partsList = new ArrayList<>();
     }
 
     public Long getIdDiagnosis() {
@@ -27,6 +31,7 @@ public class VehicleDiagnosis {
     public float getMaintenanceCost() {
         return maintenanceCost;
     }
+
 
     public Date getEvaluationDate() {
         return evaluationDate;
@@ -52,4 +57,19 @@ public class VehicleDiagnosis {
         this.isAuthorized = isAccepted;
     }
 
+    public void addPart(PartDiagnosis part) {
+        this.partsList.add(part);
+    }
+
+    public List<PartDiagnosis> getPartsList() {
+        return partsList;
+    }
+
+    public float getTotalCost() {
+        float totalPartCost = 0;
+        for (PartDiagnosis part : partsList) {
+            totalPartCost += part.getPartCost();
+        }
+        return maintenanceCost + totalPartCost;
+    }
 }

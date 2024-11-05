@@ -10,8 +10,8 @@ import java.util.List;
 
 public class AdminAccount extends UserAccount {
 
-    public AdminAccount(Long userId, String name, String phone, AccessCredentials accessCredentials) {
-        super(userId, name, phone, accessCredentials);
+    public AdminAccount(Long userId, String userName, String phone, String email, String password) {
+        super(userId, userName, phone, email, password);
     }
 
     public void authorizeVehicleMaintenance(ClientVehicle vehicle) {
@@ -26,7 +26,7 @@ public class AdminAccount extends UserAccount {
 
     public Invoice generateInvoiceForClient(ClientAccount client, ClientVehicle vehicle) {
         InvoiceGenerator invoiceGenerator = new InvoiceGenerator();
-        invoiceGenerator.generateInvoice(client, vehicle, vehicle.getDiagnosisManager().calculateAuthorizedTotalCost());
+        invoiceGenerator.generateInvoice(client, vehicle, vehicle.getDiagnosisManager().calculateAuthorizedDiagnosisCost());
         return null;
     }
 

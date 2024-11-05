@@ -2,13 +2,12 @@ package com.taller.sistema_taller.model.VehicleManagement;
 
 import java.util.Date;
 
-public class PartsDiagnosis {
-    private final Long idPartDiagnosis;
+public class PartDiagnosis {
+    private Long idPart;
     private String partDetail;
     private float partCost;
     private Date estimatedArrivalDate;
     private ShippingStatus shippingStatus;
-    private boolean isAuthorized;
 
     public enum ShippingStatus {
         NOT_ORDERED,
@@ -17,17 +16,16 @@ public class PartsDiagnosis {
         DELAYED
     }
 
-    public PartsDiagnosis(Long idPartDiagnosis, String partDetail, float partCost, Date estimatedArrivalDate) {
-        this.idPartDiagnosis = idPartDiagnosis;
+    public PartDiagnosis(Long idPart, String partDetail, float partCost, Date estimatedArrivalDate) {
+        this.idPart = idPart;
         this.partDetail = partDetail;
         this.partCost = partCost;
         this.estimatedArrivalDate = estimatedArrivalDate;
         this.shippingStatus = ShippingStatus.NOT_ORDERED;
-        this.isAuthorized = false;
     }
 
-    public Long getIdPartDiagnosis() {
-        return idPartDiagnosis;
+    public Long getIdPart() {
+        return idPart;
     }
 
     public String getPartDetail() {
@@ -42,9 +40,6 @@ public class PartsDiagnosis {
         return estimatedArrivalDate;
     }
 
-    public boolean isAuthorized() {
-        return isAuthorized;
-    }
 
     public void setPartDetail(String partDetail) {
         this.partDetail = partDetail;
@@ -66,7 +61,5 @@ public class PartsDiagnosis {
         return shippingStatus;
     }
 
-    public void setAuthorized(boolean isAccepted) {
-        this.isAuthorized = isAccepted;
-    }
+
 }
