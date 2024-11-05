@@ -6,8 +6,9 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.taller.sistema_taller.model.MaintenanceManagement.MaintenanceAdvance;
 import com.taller.sistema_taller.model.VehicleManagement.ClientVehicle;
-import com.taller.sistema_taller.model.VehicleManagement.PartsDiagnosis;
+import com.taller.sistema_taller.model.VehicleManagement.PartDiagnosis;
 import com.taller.sistema_taller.model.VehicleManagement.VehicleDiagnosis;
+
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
 import java.util.List;
@@ -15,13 +16,12 @@ import java.util.List;
 public class ReportGenerator {
 
     public FinalProcessReport generateFinalReport(ClientVehicle vehicle) {
-        List<VehicleDiagnosis> vehicleDiagnoses = vehicle.getDiagnosisManager().getMaintenanceDiagnoses();
-        List<PartsDiagnosis> partsDiagnoses = vehicle.getDiagnosisManager().getPartsDiagnoses();
-        List<MaintenanceAdvance> advances = vehicle.getMaintenanceManager().getMaintenanceProgresses();
-        float totalCost = vehicle.getDiagnosisManager().calculateTotalCost();
+        List<VehicleDiagnosis> vehicleDiagnoses = vehicle.getDiagnosisManager().getDiagnoses();
+        List<MaintenanceAdvance> advances = vehicle.getMaintenanceManager().getMaintenanceProgresses(); // Modificación
+        float totalCost = vehicle.getDiagnosisManager().calculateAuthorizedDiagnosisCost();
         Date finalizationDate = new Date();
 
-        return new FinalProcessReport(vehicleDiagnoses, partsDiagnoses, advances, totalCost, finalizationDate);
+        return new FinalProcessReport(vehicleDiagnoses, advances, totalCost, finalizationDate);
     }
 
     public byte[] exportReportToPDF(FinalProcessReport report) {
@@ -41,16 +41,15 @@ public class ReportGenerator {
             // Diagnósticos de mantenimiento
             document.add(new Paragraph("Maintenance Diagnoses:"));
             for (VehicleDiagnosis diagnosis : report.getVehicleDiagnoses()) {
-                document.add(
-                        new Paragraph("- " + diagnosis.getProblemDetail() + ": $" + diagnosis.getMaintenanceCost()));
-            }
+                document.add(new Paragraph("- " + diagnosis.getProblemDetail() + ": $" + diagnosis.getMaintenanceCost()));
 
-            document.add(new Paragraph("\n"));
-
-            // Diagnósticos de piezas
-            document.add(new Paragraph("Parts Diagnoses:"));
-            for (PartsDiagnosis part : report.getPartsDiagnoses()) {
-                document.add(new Paragraph("- " + part.getPartDetail() + ": $" + part.getPartCost()));
+                // Diagnósticos de piezas dentro del diagnóstico de vehículo
+                if (!diagnosis.getPartsList().isEmpty()) {
+                    document.add(new Paragraph("   Parts Diagnoses:"));
+                    for (PartDiagnosis part : diagnosis.getPartsList()) {
+                        document.add(new Paragraph("   - " + part.getPartDetail() + ": $" + part.getPartCost()));
+                    }
+                }
             }
 
             document.add(new Paragraph("\n"));
@@ -58,8 +57,7 @@ public class ReportGenerator {
             // Avances de mantenimiento
             document.add(new Paragraph("Maintenance Advances:"));
             for (MaintenanceAdvance advance : report.getAdvances()) {
-                document.add(
-                        new Paragraph("- Date: " + advance.getDate() + " | Description: " + advance.getDescription()));
+                document.add(new Paragraph("- Date: " + advance.getDate() + " | Description: " + advance.getDescription()));
             }
 
             document.close();

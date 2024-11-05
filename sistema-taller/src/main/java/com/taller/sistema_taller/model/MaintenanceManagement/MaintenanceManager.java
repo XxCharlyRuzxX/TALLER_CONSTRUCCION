@@ -34,7 +34,7 @@ public class MaintenanceManager {
     }
 
     // Método para añadir una imagen a un avance específico usando el ID
-    public boolean addImageToAdvance(Long advanceId, byte[] image) {
+    public boolean addImageToAdvanceById(Long advanceId, byte[] image) {
         Optional<MaintenanceAdvance> advanceOpt = maintenanceProgresses.stream()
                 .filter(advance -> advance.getIdMaintenanceAdvance().equals(advanceId))
                 .findFirst();
@@ -47,7 +47,7 @@ public class MaintenanceManager {
     }
 
     // Método para obtener un avance de mantenimiento por ID
-    public MaintenanceAdvance getMaintenanceAdvance(Long advanceId) {
+    public MaintenanceAdvance getMaintenanceAdvanceById(Long advanceId) {
         return maintenanceProgresses.stream()
                 .filter(advance -> advance.getIdMaintenanceAdvance().equals(advanceId))
                 .findFirst()

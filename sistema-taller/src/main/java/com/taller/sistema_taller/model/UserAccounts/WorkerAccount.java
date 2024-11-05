@@ -6,8 +6,8 @@ import java.util.List;
 
 public class WorkerAccount extends UserAccount {
 
-    public WorkerAccount(Long userId, String name, String phone, AccessCredentials accessCredentials) {
-        super(userId, name, phone, accessCredentials);
+    public WorkerAccount(Long userId, String userName, String phone, String email, String password) {
+        super(userId, userName, phone, email, password);
     }
 
     public void registerMaintenanceProgress(ClientVehicle vehicle, String descrpition, List<byte[]> imagesAdvance) {

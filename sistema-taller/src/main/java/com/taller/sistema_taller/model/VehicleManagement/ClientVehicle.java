@@ -5,14 +5,14 @@ import com.taller.sistema_taller.model.MaintenanceManagement.MaintenanceManager;
 public class ClientVehicle {
     private final Long idClient;
     private StaticVehicleData staticVehicleData;
-    private DynamicVehicleData dynamicVehicleData;
+    private NonStaticVehicleData nonStaticVehicleData;
     private final DiagnosisManager diagnosisManager;
     private final MaintenanceManager maintenanceManager;
 
-    public ClientVehicle(Long idClient, StaticVehicleData staticVehicleData, DynamicVehicleData dynamicVehicleData) {
+    public ClientVehicle(Long idClient, StaticVehicleData staticVehicleData, NonStaticVehicleData nonStaticVehicleData) {
         this.idClient = idClient;
         this.staticVehicleData = staticVehicleData;
-        this.dynamicVehicleData = dynamicVehicleData;
+        this.nonStaticVehicleData = nonStaticVehicleData;
         this.diagnosisManager = new DiagnosisManager();
         this.maintenanceManager = new MaintenanceManager();
     }
@@ -29,12 +29,12 @@ public class ClientVehicle {
         this.staticVehicleData = staticVehicleData;
     }
 
-    public DynamicVehicleData getDynamicVehicleData() {
-        return dynamicVehicleData;
+    public NonStaticVehicleData getDynamicVehicleData() {
+        return nonStaticVehicleData;
     }
 
-    public void updateDynamicVehicleData(DynamicVehicleData dynamicVehicleData) {
-        this.dynamicVehicleData = dynamicVehicleData;
+    public NonStaticVehicleData getNonStaticVehicleData() {
+      return nonStaticVehicleData;
     }
 
     public DiagnosisManager getDiagnosisManager() {

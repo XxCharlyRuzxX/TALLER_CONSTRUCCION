@@ -3,7 +3,6 @@ package com.taller.sistema_taller.model.InvoiceGeneration;
 import com.taller.sistema_taller.model.UserAccounts.UserAccount;
 import com.taller.sistema_taller.model.VehicleManagement.ClientVehicle;
 import com.taller.sistema_taller.model.VehicleManagement.DiagnosisManager;
-import com.taller.sistema_taller.model.VehicleManagement.PartsDiagnosis;
 import com.taller.sistema_taller.model.VehicleManagement.VehicleDiagnosis;
 import java.util.Date;
 import java.util.List;
@@ -40,10 +39,7 @@ public class Invoice {
     }
 
     public List<VehicleDiagnosis> getAuthorizedMaintenanceDiagnoses() {
-        return diagnosisManager.getMaintenanceDiagnoses();
+        return diagnosisManager.getAuthorizedDiagnoses();
     }
 
-    public List<PartsDiagnosis> getAuthorizedPartsDiagnoses() {
-        return diagnosisManager.getAuthorizedPartsDiagnoses();
-    }
 }

@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 
 import com.taller.sistema_taller.dto.LoginDTO;
 import com.taller.sistema_taller.dto.UserDTO;
-import com.taller.sistema_taller.model.UserAccounts.AccessCredentials;
 import com.taller.sistema_taller.model.UserAccounts.AdminAccount;
 import com.taller.sistema_taller.model.UserAccounts.ClientAccount;
 import com.taller.sistema_taller.model.UserAccounts.UserAccount;
@@ -21,18 +20,20 @@ public class UserService implements UserServiceInterface {
 
     @Override
     public UserAccount registerUser(UserDTO userDto, String userType) {
-        AccessCredentials credentials = new AccessCredentials(userDto.getEmail(), userDto.getPassword());
         UserAccount newUser;
 
         switch (userType.toLowerCase()) {
             case "admin":
-                newUser = new AdminAccount(userIdCounter++, userDto.getName(), userDto.getPhone(), credentials);
+                newUser = new AdminAccount(userIdCounter++, userDto.getName(), userDto.getPhone(), userDto.getEmail(),
+                        userDto.getPassword());
                 break;
             case "client":
-                newUser = new ClientAccount(userIdCounter++, userDto.getName(), userDto.getPhone(), credentials);
+                newUser = new ClientAccount(userIdCounter++, userDto.getName(), userDto.getPhone(), userDto.getEmail(),
+                        userDto.getPassword());
                 break;
             case "worker":
-                newUser = new WorkerAccount(userIdCounter++, userDto.getName(), userDto.getPhone(), credentials);
+                newUser = new WorkerAccount(userIdCounter++, userDto.getName(), userDto.getPhone(), userDto.getEmail(),
+                        userDto.getPassword());
                 break;
             default:
                 throw new IllegalArgumentException("Tipo de usuario no válido.");
@@ -47,7 +48,7 @@ public class UserService implements UserServiceInterface {
         UserAccount existingUser = userDatabase.get(id);
         if (existingUser != null) {
             existingUser.setUserName(userDto.getName());
-            existingUser.setPhone(userDto.getPhone());
+            existingUser.setUserPhone(userDto.getPhone());
             existingUser.getAccessCredentials().setEmail(userDto.getEmail());
             existingUser.getAccessCredentials().setPassword(userDto.getPassword());
             return existingUser;
@@ -76,5 +77,3 @@ public class UserService implements UserServiceInterface {
     }
 
 }
-
-

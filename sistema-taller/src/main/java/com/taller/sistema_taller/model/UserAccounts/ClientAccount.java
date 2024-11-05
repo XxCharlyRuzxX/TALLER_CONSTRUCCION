@@ -2,8 +2,8 @@ package com.taller.sistema_taller.model.UserAccounts;
 
 public class ClientAccount extends UserAccount {
 
-    public ClientAccount(Long userId, String name, String phone, AccessCredentials accessCredentials) {
-        super(userId, name, phone, accessCredentials);
+    public ClientAccount(Long userId, String userName, String phone, String email, String password) {
+        super(userId, userName, phone, email, password);
     }
 
     public void authorizeDiagnostic() {

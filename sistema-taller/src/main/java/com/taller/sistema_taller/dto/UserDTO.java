@@ -7,7 +7,6 @@ public class UserDTO {
   private String email;
   private String password; // Almacenar con seguridad
 
-  // Getters y Setters
   public Long getUserId() {
       return userId;
   }
