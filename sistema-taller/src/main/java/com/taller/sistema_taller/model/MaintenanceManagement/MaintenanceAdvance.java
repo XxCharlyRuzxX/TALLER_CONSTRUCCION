@@ -1,20 +1,28 @@
 package com.taller.sistema_taller.model.MaintenanceManagement;
 
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Entity
 public class MaintenanceAdvance {
-    private final Long idMaintenanceAdvance;
-    private final Date date;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idMaintenanceAdvance;
+    private Date date;
     private String description;
-    private final List<byte[]> imagesAdvance;
 
-    public MaintenanceAdvance(Long idMaintenanceAdvance, Date date, String description) {
-        this.idMaintenanceAdvance = idMaintenanceAdvance;
+    @ElementCollection
+    @Lob
+    private List<byte[]> imagesAdvance = new ArrayList<>();
+
+    public MaintenanceAdvance() {
+    }
+
+    public MaintenanceAdvance(Date date, String description) {
         this.date = date;
         this.description = description;
-        this.imagesAdvance = new ArrayList<>();
     }
 
     public Long getIdMaintenanceAdvance() {

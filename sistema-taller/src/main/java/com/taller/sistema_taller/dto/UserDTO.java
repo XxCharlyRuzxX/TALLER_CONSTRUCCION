@@ -2,10 +2,10 @@ package com.taller.sistema_taller.dto;
 
 public class UserDTO {
   private Long userId;
-  private String name;
+  private String userName;
   private String phone;
   private String email;
-  private String password; // Almacenar con seguridad
+  private String password;
 
   public Long getUserId() {
       return userId;
@@ -13,11 +13,11 @@ public class UserDTO {
   public void setUserId(Long userId) {
       this.userId = userId;
   }
-  public String getName() {
-      return name;
+  public String getUserName() {
+      return userName;
   }
-  public void setName(String name) {
-      this.name = name;
+  public void setUserName(String userName) {
+      this.userName = userName;
   }
   public String getPhone() {
       return phone;

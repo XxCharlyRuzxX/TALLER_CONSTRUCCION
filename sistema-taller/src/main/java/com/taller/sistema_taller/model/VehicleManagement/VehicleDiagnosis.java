@@ -4,12 +4,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import jakarta.persistence.*;
+
+@Entity
 public class VehicleDiagnosis {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idDiagnosis;
     private String problemDetail;
     private float maintenanceCost;
     private Date evaluationDate;
     private boolean isAuthorized;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PartDiagnosis> partsList;
 
     public VehicleDiagnosis(String problemDetail, float maintenanceCost, Date evaluationDate) {
@@ -18,6 +25,9 @@ public class VehicleDiagnosis {
         this.evaluationDate = evaluationDate;
         this.isAuthorized = false;
         this.partsList = new ArrayList<>();
+    }
+
+    public VehicleDiagnosis() {
     }
 
     public Long getIdDiagnosis() {
@@ -31,7 +41,6 @@ public class VehicleDiagnosis {
     public float getMaintenanceCost() {
         return maintenanceCost;
     }
-
 
     public Date getEvaluationDate() {
         return evaluationDate;

@@ -1,12 +1,17 @@
 package com.taller.sistema_taller.model.VehicleManagement;
 
 import java.util.Date;
-
+import jakarta.persistence.*;
+@Entity
 public class PartDiagnosis {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idPart;
     private String partDetail;
     private float partCost;
     private Date estimatedArrivalDate;
+    @Enumerated(EnumType.STRING)
     private ShippingStatus shippingStatus;
 
     public enum ShippingStatus {
@@ -15,6 +20,8 @@ public class PartDiagnosis {
         DELIVERED,
         DELAYED
     }
+
+    public PartDiagnosis() {}
 
     public PartDiagnosis(Long idPart, String partDetail, float partCost, Date estimatedArrivalDate) {
         this.idPart = idPart;

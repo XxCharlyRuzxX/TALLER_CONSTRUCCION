@@ -1,9 +1,12 @@
 package com.taller.sistema_taller.model.VehicleManagement;
 
+import jakarta.persistence.Embeddable;
+
+@Embeddable
 public class StaticVehicleData {
-    private final String brand;
-    private final String model;
-    private final int year;
+    private String brand;
+    private String model;
+    private int year;
     private String licensePlate;
 
     public StaticVehicleData(String brand, String model, int year, String licensePlate) {
@@ -11,6 +14,9 @@ public class StaticVehicleData {
         this.model = model;
         this.year = year;
         this.licensePlate = licensePlate;
+    }
+
+    public StaticVehicleData() {
     }
 
     public String getBrand() {

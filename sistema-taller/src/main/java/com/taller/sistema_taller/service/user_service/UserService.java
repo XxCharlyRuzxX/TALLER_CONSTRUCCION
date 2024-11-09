@@ -1,5 +1,6 @@
 package com.taller.sistema_taller.service.user_service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.taller.sistema_taller.dto.LoginDTO;
@@ -8,72 +9,70 @@ import com.taller.sistema_taller.model.UserAccounts.AdminAccount;
 import com.taller.sistema_taller.model.UserAccounts.ClientAccount;
 import com.taller.sistema_taller.model.UserAccounts.UserAccount;
 import com.taller.sistema_taller.model.UserAccounts.WorkerAccount;
+import com.taller.sistema_taller.repositories.UserAccountRepository;
 import com.taller.sistema_taller.service.user_service.interfaces.UserServiceInterface;
-import java.util.HashMap;
-import java.util.Map;
+import jakarta.transaction.Transactional;
+
+
 
 @Service
 public class UserService implements UserServiceInterface {
 
-    private final Map<Long, UserAccount> userDatabase = new HashMap<>();
-    private Long userIdCounter = 1L;
+    private final UserAccountRepository userAccountRepository;
+
+    @Autowired
+    public UserService(UserAccountRepository userAccountRepository) {
+        this.userAccountRepository = userAccountRepository;
+    }
 
     @Override
+    @Transactional
     public UserAccount registerUser(UserDTO userDto, String userType) {
         UserAccount newUser;
 
         switch (userType.toLowerCase()) {
             case "admin":
-                newUser = new AdminAccount(userIdCounter++, userDto.getName(), userDto.getPhone(), userDto.getEmail(),
-                        userDto.getPassword());
+                newUser = new AdminAccount(null, userDto.getUserName(), userDto.getPhone(), userDto.getEmail(), userDto.getPassword());
                 break;
             case "client":
-                newUser = new ClientAccount(userIdCounter++, userDto.getName(), userDto.getPhone(), userDto.getEmail(),
-                        userDto.getPassword());
+                newUser = new ClientAccount(null, userDto.getUserName(), userDto.getPhone(), userDto.getEmail(), userDto.getPassword());
                 break;
             case "worker":
-                newUser = new WorkerAccount(userIdCounter++, userDto.getName(), userDto.getPhone(), userDto.getEmail(),
-                        userDto.getPassword());
+                newUser = new WorkerAccount(null, userDto.getUserName(), userDto.getPhone(), userDto.getEmail(), userDto.getPassword());
                 break;
             default:
                 throw new IllegalArgumentException("Tipo de usuario no válido.");
         }
 
-        userDatabase.put(newUser.getUserId(), newUser);
-        return newUser;
+        return userAccountRepository.save(newUser);
     }
 
     @Override
+    @Transactional
     public UserAccount updateUser(Long id, UserDTO userDto) {
-        UserAccount existingUser = userDatabase.get(id);
-        if (existingUser != null) {
-            existingUser.setUserName(userDto.getName());
+        return userAccountRepository.findById(id).map(existingUser -> {
+            existingUser.setUserName(userDto.getUserName());
             existingUser.setUserPhone(userDto.getPhone());
             existingUser.getAccessCredentials().setEmail(userDto.getEmail());
             existingUser.getAccessCredentials().setPassword(userDto.getPassword());
-            return existingUser;
-        }
-        return null;
+            return userAccountRepository.save(existingUser);
+        }).orElse(null);
     }
 
     @Override
+    @Transactional
     public void deleteUser(Long id) {
-        userDatabase.remove(id);
+        userAccountRepository.deleteById(id);
     }
 
     @Override
     public UserAccount findUserById(Long id) {
-        return userDatabase.get(id);
+        return userAccountRepository.findById(id).orElse(null);
     }
 
     @Override
     public boolean authenticateUser(LoginDTO loginDto) {
-        for (UserAccount user : userDatabase.values()) {
-            if (user.getAccessCredentials().validateCredentials(loginDto.getEmail(), loginDto.getPassword())) {
-                return true;
-            }
-        }
-        return false;
+        return userAccountRepository.findAll().stream()
+                .anyMatch(user -> user.getAccessCredentials().validateCredentials(loginDto.getEmail(), loginDto.getPassword()));
     }
-
 }

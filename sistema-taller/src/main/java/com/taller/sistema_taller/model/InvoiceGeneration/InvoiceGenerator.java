@@ -41,7 +41,7 @@ public class InvoiceGenerator {
 
             // Detalles del vehículo
             document.add(new Paragraph("Vehicle Details:", subHeaderFont));
-            document.add(new Paragraph("Vehicle ID: " + invoice.getVehicle().getIdClient(), regularFont));
+            document.add(new Paragraph("Vehicle ID: " + invoice.getVehicle().getIdVehicle(), regularFont));
             document.add(new Paragraph("Vehicle Model: " + invoice.getVehicle().getStaticVehicleData().getModel(),
                     regularFont));
 

@@ -2,8 +2,15 @@ package com.taller.sistema_taller.model.VehicleManagement;
 
 import java.util.ArrayList;
 import java.util.List;
+import jakarta.persistence.*;
 
+@Entity
 public class DiagnosisManager {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idDiagnosisManager;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<VehicleDiagnosis> vehicleDiagnoses;
 
     public DiagnosisManager() {

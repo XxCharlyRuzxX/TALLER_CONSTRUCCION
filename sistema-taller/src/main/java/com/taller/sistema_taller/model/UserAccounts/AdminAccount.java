@@ -7,12 +7,17 @@ import com.taller.sistema_taller.model.MaintenanceManagement.MaintenanceStatus;
 import com.taller.sistema_taller.model.SatisfactionSurveys.SatisfactionSurvey;
 import com.taller.sistema_taller.model.VehicleManagement.ClientVehicle;
 import java.util.List;
-
+import jakarta.persistence.Entity;
+@Entity
 public class AdminAccount extends UserAccount {
 
     public AdminAccount(Long userId, String userName, String phone, String email, String password) {
         super(userId, userName, phone, email, password);
     }
+
+    public AdminAccount() {
+    }
+
 
     public void authorizeVehicleMaintenance(ClientVehicle vehicle) {
         vehicle.getMaintenanceManager().setMaintenanceStatus(MaintenanceStatus.IN_PROGRESS);
