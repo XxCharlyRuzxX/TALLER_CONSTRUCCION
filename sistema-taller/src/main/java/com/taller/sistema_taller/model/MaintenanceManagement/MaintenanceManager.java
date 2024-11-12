@@ -4,27 +4,30 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import jakarta.persistence.*;
 
+@Entity
 public class MaintenanceManager {
-    private final List<MaintenanceAdvance> maintenanceProgresses;
-    private MaintenanceStatus maintenanceStatus;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idMaintenanceManager;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MaintenanceAdvance> maintenanceProgresses = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    private MaintenanceStatus maintenanceStatus = MaintenanceStatus.PENDING;
 
     public MaintenanceManager() {
-        this.maintenanceProgresses = new ArrayList<>();
-        this.maintenanceStatus = MaintenanceStatus.PENDING;
     }
 
-    // Añade un avance de mantenimiento sin imágenes
-    public void addMaintenanceAdvance(String description) {
-        Long id = generateUniqueId();
-        MaintenanceAdvance advance = new MaintenanceAdvance(id, new Date(), description);
+    public void addMaintenanceAdvanceWithoutImage(String description) {
+        MaintenanceAdvance advance = new MaintenanceAdvance(new Date(), description);
         maintenanceProgresses.add(advance);
     }
 
-    // Añade un avance de mantenimiento con imágenes
-    public void addMaintenanceAdvance(String description, List<byte[]> images) {
-        Long id = generateUniqueId();
-        MaintenanceAdvance advance = new MaintenanceAdvance(id, new Date(), description);
+    public void addMaintenanceAdvanceWithImages(String description, List<byte[]> images) {
+        MaintenanceAdvance advance = new MaintenanceAdvance(new Date(), description);
         if (images != null) {
             for (byte[] image : images) {
                 advance.addImage(image);
@@ -33,7 +36,6 @@ public class MaintenanceManager {
         maintenanceProgresses.add(advance);
     }
 
-    // Método para añadir una imagen a un avance específico usando el ID
     public boolean addImageToAdvanceById(Long advanceId, byte[] image) {
         Optional<MaintenanceAdvance> advanceOpt = maintenanceProgresses.stream()
                 .filter(advance -> advance.getIdMaintenanceAdvance().equals(advanceId))
@@ -46,7 +48,6 @@ public class MaintenanceManager {
         return false;
     }
 
-    // Método para obtener un avance de mantenimiento por ID
     public MaintenanceAdvance getMaintenanceAdvanceById(Long advanceId) {
         return maintenanceProgresses.stream()
                 .filter(advance -> advance.getIdMaintenanceAdvance().equals(advanceId))
@@ -66,11 +67,8 @@ public class MaintenanceManager {
         return maintenanceStatus;
     }
 
-    public boolean removeMaintenanceAdvance(Long advanceId) {
+    public boolean removeMaintenanceAdvancebyId(Long advanceId) {
         return maintenanceProgresses.removeIf(advance -> advance.getIdMaintenanceAdvance().equals(advanceId));
     }
 
-    private Long generateUniqueId() {
-        return (long) (maintenanceProgresses.size() + 1);
-    }
 }

@@ -1,16 +1,30 @@
 package com.taller.sistema_taller.model.UserAccounts;
 
+import jakarta.persistence.*;
+
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public class UserAccount {
-    private final Long userId;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long userId;
+
     private String userName;
+
     private String userPhone;
-    private final AccessCredentials accessCredentials;
+
+    @Embedded
+    private AccessCredentials accessCredentials;
 
     public UserAccount(Long userId, String userName, String phone, String email, String password) {
         this.userId = userId;
         this.userName = userName;
         this.userPhone = phone;
         this.accessCredentials = new AccessCredentials(email, password);
+    }
+
+    public UserAccount() {
     }
 
     public void updateUserPhone(String newPhone) {

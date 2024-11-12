@@ -1,10 +1,13 @@
-
 package com.taller.sistema_taller.model.VehicleManagement;
+import jakarta.persistence.Embeddable;
 
+@Embeddable
 public class NonStaticVehicleData {
     private int mileage;
     private float fuelLevel;
     private String additionalObservations;
+
+    public NonStaticVehicleData() {}
 
     public NonStaticVehicleData(int mileage, float fuelLevel, String additionalObservations) {
         this.mileage = mileage;
