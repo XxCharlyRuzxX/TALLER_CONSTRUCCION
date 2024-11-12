@@ -17,14 +17,13 @@ public class VehicleDiagnosis {
     private Date evaluationDate;
     private boolean isAuthorized;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PartDiagnosis> partsList;
+    private List<PartDiagnosis> partsList = new ArrayList<>();
 
     public VehicleDiagnosis(String problemDetail, float maintenanceCost, Date evaluationDate) {
         this.problemDetail = problemDetail;
         this.maintenanceCost = maintenanceCost;
         this.evaluationDate = evaluationDate;
         this.isAuthorized = false;
-        this.partsList = new ArrayList<>();
     }
 
     public VehicleDiagnosis() {
