@@ -6,8 +6,6 @@ El sistema ofrece un flujo de trabajo sistematizado que incluye la generación d
 #### Integrantes 
 - Caballero Beltrán Mariana
 
-- Canul Couoh Cecilia Carolina
-
 - Góngora Paredes Andrea Natalia
 
 - Pinzón Rosado Mateo Isaí
