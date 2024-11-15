@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -26,24 +25,16 @@ public class PartDiagnosisController {
     public ResponseEntity<PartDiagnosisDTO> addPart(
             @PathVariable Long diagnosisId,
             @RequestBody PartDiagnosisDTO partDto) {
-        try {
-            PartDiagnosisDTO part = partDiagnosisService.addPart(diagnosisId, partDto);
-            return new ResponseEntity<>(part, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
+        PartDiagnosisDTO part = partDiagnosisService.addPart(diagnosisId, partDto);
+        return new ResponseEntity<>(part, HttpStatus.CREATED);
     }
 
     @GetMapping("/{partId}")
     public ResponseEntity<PartDiagnosisDTO> getPartById(
             @PathVariable Long diagnosisId,
             @PathVariable Long partId) {
-        try {
-            PartDiagnosisDTO part = partDiagnosisService.getPartById(diagnosisId, partId);
-            return ResponseEntity.ok(part);
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        }
+        PartDiagnosisDTO part = partDiagnosisService.getPartById(diagnosisId, partId);
+        return ResponseEntity.ok(part);
     }
 
     @GetMapping
@@ -65,12 +56,8 @@ public class PartDiagnosisController {
             @PathVariable Long diagnosisId,
             @PathVariable Long partId,
             @RequestParam PartDiagnosis.ShippingStatus status) {
-        try {
-            partDiagnosisService.updatePartStatus(diagnosisId, partId, status);
-            return ResponseEntity.ok().build();
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
+        partDiagnosisService.updatePartStatus(diagnosisId, partId, status);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/total-cost")

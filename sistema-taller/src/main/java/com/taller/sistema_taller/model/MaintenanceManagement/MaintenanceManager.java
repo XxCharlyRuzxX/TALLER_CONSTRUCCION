@@ -21,6 +21,10 @@ public class MaintenanceManager {
     public MaintenanceManager() {
     }
 
+    public Long getIdMaintenanceManager() {
+        return idMaintenanceManager;
+    }
+
     public void addMaintenanceAdvanceWithoutImage(String description) {
         MaintenanceAdvance advance = new MaintenanceAdvance(new Date(), description);
         maintenanceProgresses.add(advance);

@@ -20,5 +20,7 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
 
     @Query("SELECT w FROM WorkerAccount w")
     List<WorkerAccount> findAllWorkerAccounts();
+
+    boolean existsByAccessCredentials_Email(String email);
 }
 

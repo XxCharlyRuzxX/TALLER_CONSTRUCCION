@@ -2,11 +2,11 @@ package com.taller.sistema_taller.controller;
 
 import com.taller.sistema_taller.dto.VehicleDiagnosisDTO;
 import com.taller.sistema_taller.service.diagnosis_service.interfaces.DiagnosisManagerServiceInterface;
+import com.taller.sistema_taller.service.vehicle_service.interfaces.ClientVehicleServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -15,74 +15,77 @@ import java.util.List;
 public class DiagnosisManagerController {
 
     private final DiagnosisManagerServiceInterface diagnosisManagerService;
+    private final ClientVehicleServiceInterface clientVehicleService;
 
     @Autowired
-    public DiagnosisManagerController(DiagnosisManagerServiceInterface diagnosisManagerService) {
+    public DiagnosisManagerController(DiagnosisManagerServiceInterface diagnosisManagerService,
+            ClientVehicleServiceInterface clientVehicleService) {
         this.diagnosisManagerService = diagnosisManagerService;
+        this.clientVehicleService = clientVehicleService;
     }
 
-    @PostMapping("/{diagnosisManagerId}")
+    @PostMapping("/user/{userId}")
     public ResponseEntity<Void> addDiagnosis(
-            @PathVariable Long diagnosisManagerId,
+            @PathVariable Long userId,
             @RequestBody VehicleDiagnosisDTO diagnosisDto) {
-        try {
-            diagnosisManagerService.addDiagnosis(diagnosisManagerId, diagnosisDto);
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
+        Long diagnosisManagerId = clientVehicleService.getDiagnosisManagerByUserId(userId).getIdDiagnosisManager();
+        diagnosisManagerService.addDiagnosis(diagnosisManagerId, diagnosisDto);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping("/{diagnosisManagerId}/{diagnosisId}")
+    @GetMapping("/user/{userId}/diagnosis/{diagnosisId}")
     public ResponseEntity<VehicleDiagnosisDTO> getDiagnosisById(
-            @PathVariable Long diagnosisManagerId,
+            @PathVariable Long userId,
             @PathVariable Long diagnosisId) {
-        try {
-            VehicleDiagnosisDTO diagnosis = diagnosisManagerService.getDiagnosisById(diagnosisManagerId, diagnosisId);
-            return ResponseEntity.ok(diagnosis);
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        }
+        Long diagnosisManagerId = clientVehicleService.getDiagnosisManagerByUserId(userId).getIdDiagnosisManager();
+        VehicleDiagnosisDTO diagnosis = diagnosisManagerService.getDiagnosisById(diagnosisManagerId, diagnosisId);
+        return ResponseEntity.ok(diagnosis);
     }
 
-    @GetMapping("/{diagnosisManagerId}")
+    @GetMapping("/user/{userId}")
     public ResponseEntity<List<VehicleDiagnosisDTO>> getAllDiagnoses(
-            @PathVariable Long diagnosisManagerId) {
+            @PathVariable Long userId) {
+        Long diagnosisManagerId = clientVehicleService.getDiagnosisManagerByUserId(userId).getIdDiagnosisManager();
         return ResponseEntity.ok(diagnosisManagerService.getAllDiagnoses(diagnosisManagerId));
     }
 
-    @GetMapping("/{diagnosisManagerId}/authorized")
+    @GetMapping("/user/{userId}/authorized")
     public ResponseEntity<List<VehicleDiagnosisDTO>> getAuthorizedDiagnoses(
-            @PathVariable Long diagnosisManagerId) {
+            @PathVariable Long userId) {
+        Long diagnosisManagerId = clientVehicleService.getDiagnosisManagerByUserId(userId).getIdDiagnosisManager();
         return ResponseEntity.ok(diagnosisManagerService.getAuthorizedDiagnoses(diagnosisManagerId));
     }
 
-    @DeleteMapping("/{diagnosisManagerId}/{diagnosisId}")
+    @DeleteMapping("/user/{userId}/diagnosis/{diagnosisId}")
     public ResponseEntity<Void> removeDiagnosisById(
-            @PathVariable Long diagnosisManagerId,
+            @PathVariable Long userId,
             @PathVariable Long diagnosisId) {
+        Long diagnosisManagerId = clientVehicleService.getDiagnosisManagerByUserId(userId).getIdDiagnosisManager();
         boolean removed = diagnosisManagerService.removeDiagnosisById(diagnosisManagerId, diagnosisId);
         return removed ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/{diagnosisManagerId}/{diagnosisId}")
+    @PutMapping("/user/{userId}/diagnosis/{diagnosisId}")
     public ResponseEntity<Void> updateDiagnosis(
-            @PathVariable Long diagnosisManagerId,
+            @PathVariable Long userId,
             @PathVariable Long diagnosisId,
             @RequestBody VehicleDiagnosisDTO updatedDiagnosisDto) {
+        Long diagnosisManagerId = clientVehicleService.getDiagnosisManagerByUserId(userId).getIdDiagnosisManager();
         boolean updated = diagnosisManagerService.updateDiagnosis(diagnosisManagerId, diagnosisId, updatedDiagnosisDto);
         return updated ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/{diagnosisManagerId}/total-cost")
+    @GetMapping("/user/{userId}/total-cost")
     public ResponseEntity<Float> calculateTotalDiagnosisCost(
-            @PathVariable Long diagnosisManagerId) {
+            @PathVariable Long userId) {
+        Long diagnosisManagerId = clientVehicleService.getDiagnosisManagerByUserId(userId).getIdDiagnosisManager();
         return ResponseEntity.ok(diagnosisManagerService.calculateTotalDiagnosisCost(diagnosisManagerId));
     }
 
-    @GetMapping("/{diagnosisManagerId}/authorized-cost")
+    @GetMapping("/user/{userId}/authorized-cost")
     public ResponseEntity<Float> calculateAuthorizedDiagnosisCost(
-            @PathVariable Long diagnosisManagerId) {
+            @PathVariable Long userId) {
+        Long diagnosisManagerId = clientVehicleService.getDiagnosisManagerByUserId(userId).getIdDiagnosisManager();
         return ResponseEntity.ok(diagnosisManagerService.calculateAuthorizedDiagnosisCost(diagnosisManagerId));
     }
 }

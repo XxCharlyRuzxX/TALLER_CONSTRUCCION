@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -25,22 +24,14 @@ public class ClientVehicleController {
 
     @PostMapping("/register")
     public ResponseEntity<ClientVehicle> registerVehicle(@Valid @RequestBody ClientVehicleDTO vehicleDto) {
-        try {
-            ClientVehicle newVehicle = clientVehicleService.registerVehicle(vehicleDto);
-            return new ResponseEntity<>(newVehicle, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid data for vehicle registration", e);
-        }
+        ClientVehicle newVehicle = clientVehicleService.registerVehicle(vehicleDto);
+        return new ResponseEntity<>(newVehicle, HttpStatus.CREATED);
     }
 
     @PutMapping("/{vehicleId}")
     public ResponseEntity<ClientVehicle> updateVehicle(@PathVariable String vehicleId, @Valid @RequestBody ClientVehicleDTO vehicleDto) {
-        try {
-            ClientVehicle updatedVehicle = clientVehicleService.updateVehicle(vehicleId, vehicleDto);
-            return new ResponseEntity<>(updatedVehicle, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found", e);
-        }
+        ClientVehicle updatedVehicle = clientVehicleService.updateVehicle(vehicleId, vehicleDto);
+        return new ResponseEntity<>(updatedVehicle, HttpStatus.OK);
     }
 
     @DeleteMapping("/{vehicleId}")
@@ -52,11 +43,7 @@ public class ClientVehicleController {
     @GetMapping("/{vehicleId}")
     public ResponseEntity<ClientVehicle> findVehicleById(@PathVariable String vehicleId) {
         ClientVehicle vehicle = clientVehicleService.findVehicleById(vehicleId);
-        if (vehicle != null) {
-            return ResponseEntity.ok(vehicle);
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found");
-        }
+        return ResponseEntity.ok(vehicle);
     }
 
     @GetMapping("/client/{clientId}")

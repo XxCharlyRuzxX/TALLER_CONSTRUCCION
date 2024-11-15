@@ -13,6 +13,10 @@ public class DiagnosisManager {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<VehicleDiagnosis> vehicleDiagnoses;
 
+    public Long getIdDiagnosisManager() {
+        return idDiagnosisManager;
+    }
+
     public DiagnosisManager() {
         this.vehicleDiagnoses = new ArrayList<>();
     }
