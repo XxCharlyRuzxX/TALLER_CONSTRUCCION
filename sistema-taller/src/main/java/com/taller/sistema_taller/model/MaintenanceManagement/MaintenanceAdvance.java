@@ -15,7 +15,7 @@ public class MaintenanceAdvance {
 
     @ElementCollection
     @Lob
-    private List<byte[]> imagesAdvance = new ArrayList<>();
+    private List<String> imagesAdvance = new ArrayList<>();
 
     public MaintenanceAdvance() {
     }
@@ -41,11 +41,11 @@ public class MaintenanceAdvance {
         this.description = description;
     }
 
-    public List<byte[]> getImagesAdvance() {
+    public List<String>getImagesAdvance() {
         return imagesAdvance;
     }
 
-    public void addImage(byte[] image) {
+    public void addImage(String image) {
         this.imagesAdvance.add(image);
     }
 }

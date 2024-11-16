@@ -15,7 +15,7 @@ public class WorkerAccount extends UserAccount {
     public WorkerAccount() {
     }
 
-    public void registerMaintenanceProgress(ClientVehicle vehicle, String descrpition, List<byte[]> imagesAdvance) {
+    public void registerMaintenanceProgress(ClientVehicle vehicle, String descrpition, List<String>imagesAdvance) {
         if (imagesAdvance != null) {
             vehicle.getMaintenanceManager().addMaintenanceAdvanceWithoutImage(descrpition);
         } else {

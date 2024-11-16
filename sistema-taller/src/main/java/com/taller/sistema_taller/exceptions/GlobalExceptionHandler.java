@@ -8,6 +8,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.taller.sistema_taller.exceptions.diagnosis_exceptions.DiagnosisManagerNotFoundException;
 import com.taller.sistema_taller.exceptions.diagnosis_exceptions.DiagnosisNotFoundException;
 import com.taller.sistema_taller.exceptions.diagnosis_exceptions.InvalidDiagnosisDataException;
+import com.taller.sistema_taller.exceptions.maintenance_exceptions.InvalidImageFormatException;
+import com.taller.sistema_taller.exceptions.maintenance_exceptions.InvalidMaintenanceAdvanceException;
+import com.taller.sistema_taller.exceptions.maintenance_exceptions.InvalidMaintenanceStatusException;
+import com.taller.sistema_taller.exceptions.maintenance_exceptions.MaintenanceAdvanceNotFoundException;
+import com.taller.sistema_taller.exceptions.maintenance_exceptions.MaintenanceManagerNotFoundException;
 import com.taller.sistema_taller.exceptions.part_diagnosis_exceptions.InvalidPartDataException;
 import com.taller.sistema_taller.exceptions.part_diagnosis_exceptions.PartNotFoundException;
 import com.taller.sistema_taller.exceptions.user_exceptions.*;
@@ -79,6 +84,32 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidPartDataException.class)
     public ResponseEntity<String> handleInvalidPartDataException(InvalidPartDataException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    // Maintenance exceptions
+    @ExceptionHandler(MaintenanceManagerNotFoundException.class)
+    public ResponseEntity<String> handleMaintenanceManagerNotFound(MaintenanceManagerNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(MaintenanceAdvanceNotFoundException.class)
+    public ResponseEntity<String> handleMaintenanceAdvanceNotFound(MaintenanceAdvanceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidMaintenanceAdvanceException.class)
+    public ResponseEntity<String> handleInvalidMaintenanceAdvance(InvalidMaintenanceAdvanceException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidMaintenanceStatusException.class)
+    public ResponseEntity<String> handleInvalidMaintenanceStatus(InvalidMaintenanceStatusException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidImageFormatException.class)
+    public ResponseEntity<String> handleInvalidImageFormat(InvalidImageFormatException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
