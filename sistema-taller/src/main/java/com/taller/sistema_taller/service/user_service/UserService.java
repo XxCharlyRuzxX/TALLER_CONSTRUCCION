@@ -2,15 +2,18 @@ package com.taller.sistema_taller.service.user_service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.taller.sistema_taller.dto.LoginDTO;
 import com.taller.sistema_taller.dto.UserDTO;
+import com.taller.sistema_taller.exceptions.user_exceptions.InvalidUserTypeException;
+import com.taller.sistema_taller.exceptions.user_exceptions.UserNotFoundException;
 import com.taller.sistema_taller.model.UserAccounts.AdminAccount;
 import com.taller.sistema_taller.model.UserAccounts.ClientAccount;
 import com.taller.sistema_taller.model.UserAccounts.UserAccount;
 import com.taller.sistema_taller.model.UserAccounts.WorkerAccount;
 import com.taller.sistema_taller.repositories.UserAccountRepository;
 import com.taller.sistema_taller.service.user_service.interfaces.UserServiceInterface;
+import com.taller.sistema_taller.service.user_service.user_validations.UserValidator;
+
 import jakarta.transaction.Transactional;
 
 
@@ -19,17 +22,21 @@ import jakarta.transaction.Transactional;
 public class UserService implements UserServiceInterface {
 
     private final UserAccountRepository userAccountRepository;
+    private final UserValidator userValidator;
 
     @Autowired
-    public UserService(UserAccountRepository userAccountRepository) {
+    public UserService(UserAccountRepository userAccountRepository, UserValidator userValidator) {
         this.userAccountRepository = userAccountRepository;
+        this.userValidator = userValidator;
     }
 
     @Override
     @Transactional
     public UserAccount registerUser(UserDTO userDto, String userType) {
-        UserAccount newUser;
+        userValidator.validateUserType(userType);
+        userValidator.validateEmailUniqueness(userDto.getEmail());
 
+        UserAccount newUser;
         switch (userType.toLowerCase()) {
             case "admin":
                 newUser = new AdminAccount(null, userDto.getUserName(), userDto.getPhone(), userDto.getEmail(), userDto.getPassword());
@@ -41,7 +48,7 @@ public class UserService implements UserServiceInterface {
                 newUser = new WorkerAccount(null, userDto.getUserName(), userDto.getPhone(), userDto.getEmail(), userDto.getPassword());
                 break;
             default:
-                throw new IllegalArgumentException("Tipo de usuario no válido.");
+                throw new InvalidUserTypeException("Tipo de usuario no válido");
         }
 
         return userAccountRepository.save(newUser);
@@ -50,29 +57,34 @@ public class UserService implements UserServiceInterface {
     @Override
     @Transactional
     public UserAccount updateUser(Long id, UserDTO userDto) {
+        userValidator.validateUserExists(id);
+
         return userAccountRepository.findById(id).map(existingUser -> {
             existingUser.setUserName(userDto.getUserName());
             existingUser.setUserPhone(userDto.getPhone());
             existingUser.getAccessCredentials().setEmail(userDto.getEmail());
             existingUser.getAccessCredentials().setPassword(userDto.getPassword());
             return userAccountRepository.save(existingUser);
-        }).orElse(null);
+        }).orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
     }
 
     @Override
     @Transactional
     public void deleteUser(Long id) {
+        userValidator.validateUserExists(id);
         userAccountRepository.deleteById(id);
     }
 
     @Override
     public UserAccount findUserById(Long id) {
-        return userAccountRepository.findById(id).orElse(null);
+        userValidator.validateUserExists(id);
+        return userAccountRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
     }
 
     @Override
-    public boolean authenticateUser(LoginDTO loginDto) {
-        return userAccountRepository.findAll().stream()
-                .anyMatch(user -> user.getAccessCredentials().validateCredentials(loginDto.getEmail(), loginDto.getPassword()));
+    public UserAccount authenticateUser(LoginDTO loginDto) {
+    return userAccountRepository.findByAccessCredentialsEmail(loginDto.getEmail())
+            .filter(user -> user.getAccessCredentials().validateCredentials(loginDto.getEmail(), loginDto.getPassword()))
+            .orElseThrow(() -> new UserNotFoundException("Invalid email or password"));
     }
 }

@@ -3,7 +3,6 @@ package com.taller.sistema_taller.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.taller.sistema_taller.dto.LoginDTO;
 import com.taller.sistema_taller.dto.UserDTO;
@@ -22,48 +21,33 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserAccount> registerUser(@Valid @RequestBody UserDTO userDto, @RequestParam String userType) {
-        try {
-            UserAccount createdUser = userService.registerUser(userDto, userType);
-            return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid user type", e);
-        }
+    public ResponseEntity<UserAccount> registerUser(@Valid @RequestBody UserDTO userDto,
+            @RequestParam String userType) {
+        UserAccount createdUser = userService.registerUser(userDto, userType);
+        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserAccount> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDto) {
         UserAccount updatedUser = userService.updateUser(id, userDto);
-        if (updatedUser != null) {
-            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
-        return new ResponseEntity<>("User deleted successfully", HttpStatus.NO_CONTENT);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserAccount> findUserById(@PathVariable Long id) {
         UserAccount user = userService.findUserById(id);
-        if (user != null) {
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> authenticateUser(@Valid @RequestBody LoginDTO loginDto) {
-        boolean isAuthenticated = userService.authenticateUser(loginDto);
-        if (isAuthenticated) {
-            return new ResponseEntity<>("Authentication successful", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Invalid credentials", HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity<UserAccount> authenticateUser(@Valid @RequestBody LoginDTO loginDto) {
+        UserAccount authenticatedUser = userService.authenticateUser(loginDto);
+        return ResponseEntity.ok(authenticatedUser);
     }
 }

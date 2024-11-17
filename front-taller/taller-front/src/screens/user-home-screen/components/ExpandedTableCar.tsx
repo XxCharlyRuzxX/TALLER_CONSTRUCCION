@@ -1,13 +1,19 @@
 import React, { useState } from "react";
-import { Accordion, AccordionSummary, AccordionDetails, Typography, IconButton, } from "@mui/material";
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Typography,
+  IconButton,
+} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddIcon from "@mui/icons-material/Add";
 import CarTable from "./CarTable";
-import { Colors } from '../../../utils/Colors';
-import Car  from "../interfaces/Car";
+import { Colors } from "../../../utils/Colors";
+import { ClientVehicle } from "../../../interfaces/ClientVehicle";
 
 interface ExpandableTableProps {
-  cars: Car[];
+  cars: ClientVehicle[];
   title: string;
   onAddCar: () => void;
 }
@@ -25,7 +31,7 @@ export const ExpandableTableCard: React.FC<ExpandableTableProps> = ({
     setExpanded(!expanded);
   };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
@@ -45,30 +51,37 @@ export const ExpandableTableCard: React.FC<ExpandableTableProps> = ({
     <Accordion
       expanded={expanded}
       onChange={handleExpandClick}
-      sx={{ mt: 2, backgroundColor: Colors.HighlightGray, borderRadius: 4, overflow: "hidden" }}
+      sx={{
+        mt: 2,
+        backgroundColor: Colors.HighlightGray,
+        borderRadius: 4,
+        overflow: "hidden",
+      }}
     >
       <AccordionSummary
-  expandIcon={<ExpandMoreIcon sx={{ color: "white" }} />}
-  sx={{
-    color: "white",
-    backgroundColor: Colors.HighlightGray,
-    borderRadius: "25px",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  }}
->
-  <Typography variant="h6">{title}</Typography>
-  <div style={{ display: "flex", alignItems: "center", marginLeft: "auto" }}>
-    <IconButton
-      aria-label="Agregar Auto"
-      onClick={handleAddCarClick}
-      sx={{ color: "white" }}
-    >
-      <AddIcon />
-    </IconButton>
-  </div>
-</AccordionSummary>
+        expandIcon={<ExpandMoreIcon sx={{ color: Colors.White }} />}
+        sx={{
+          color: "white",
+          backgroundColor: Colors.HighlightGray,
+          borderRadius: "25px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Typography variant="h6">{title}</Typography>
+        <div
+          style={{ display: "flex", alignItems: "center", marginLeft: "auto" }}
+        >
+          <IconButton
+            aria-label="Agregar Auto"
+            onClick={handleAddCarClick}
+            sx={{ color: Colors.White }}
+          >
+            <AddIcon />
+          </IconButton>
+        </div>
+      </AccordionSummary>
       <AccordionDetails
         sx={{ backgroundColor: Colors.PrimaryGray, borderRadius: "0" }}
       >

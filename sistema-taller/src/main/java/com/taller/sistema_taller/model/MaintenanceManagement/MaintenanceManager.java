@@ -21,22 +21,26 @@ public class MaintenanceManager {
     public MaintenanceManager() {
     }
 
+    public Long getIdMaintenanceManager() {
+        return idMaintenanceManager;
+    }
+
     public void addMaintenanceAdvanceWithoutImage(String description) {
         MaintenanceAdvance advance = new MaintenanceAdvance(new Date(), description);
         maintenanceProgresses.add(advance);
     }
 
-    public void addMaintenanceAdvanceWithImages(String description, List<byte[]> images) {
+    public void addMaintenanceAdvanceWithImages(String description, List<String> images) {
         MaintenanceAdvance advance = new MaintenanceAdvance(new Date(), description);
         if (images != null) {
-            for (byte[] image : images) {
+            for (String image : images) {
                 advance.addImage(image);
             }
         }
         maintenanceProgresses.add(advance);
     }
 
-    public boolean addImageToAdvanceById(Long advanceId, byte[] image) {
+    public boolean addImageToAdvanceById(Long advanceId, String image) {
         Optional<MaintenanceAdvance> advanceOpt = maintenanceProgresses.stream()
                 .filter(advance -> advance.getIdMaintenanceAdvance().equals(advanceId))
                 .findFirst();

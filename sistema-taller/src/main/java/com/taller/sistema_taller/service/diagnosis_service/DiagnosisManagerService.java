@@ -6,10 +6,12 @@ import com.taller.sistema_taller.model.VehicleManagement.DiagnosisManager;
 import com.taller.sistema_taller.model.VehicleManagement.VehicleDiagnosis;
 import com.taller.sistema_taller.model.VehicleManagement.PartDiagnosis;
 import com.taller.sistema_taller.repositories.DiagnosisManagerRepository;
+import com.taller.sistema_taller.service.diagnosis_service.diagnosis_validations.DiagnosisValidator;
 import com.taller.sistema_taller.service.diagnosis_service.interfaces.DiagnosisManagerServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,15 +20,19 @@ import java.util.stream.Collectors;
 public class DiagnosisManagerService implements DiagnosisManagerServiceInterface {
 
   private final DiagnosisManagerRepository diagnosisManagerRepository;
+  private final DiagnosisValidator diagnosisValidator;
 
   @Autowired
-  public DiagnosisManagerService(DiagnosisManagerRepository diagnosisManagerRepository) {
+  public DiagnosisManagerService(DiagnosisManagerRepository diagnosisManagerRepository,
+      DiagnosisValidator diagnosisValidator) {
     this.diagnosisManagerRepository = diagnosisManagerRepository;
+    this.diagnosisValidator = diagnosisValidator;
   }
 
   @Override
   @Transactional
   public void addDiagnosis(Long diagnosisManagerId, VehicleDiagnosisDTO diagnosisDto) {
+    diagnosisValidator.validateDiagnosisData(diagnosisDto);
     DiagnosisManager diagnosisManager = getDiagnosisManagerById(diagnosisManagerId);
     VehicleDiagnosis diagnosis = convertToVehicleDiagnosis(diagnosisDto);
     diagnosisManager.addDiagnosis(diagnosis);
@@ -45,6 +51,7 @@ public class DiagnosisManagerService implements DiagnosisManagerServiceInterface
   @Override
   public VehicleDiagnosisDTO getDiagnosisById(Long diagnosisManagerId, Long diagnosisId) {
     DiagnosisManager diagnosisManager = getDiagnosisManagerById(diagnosisManagerId);
+    diagnosisValidator.validateDiagnosisExists(diagnosisId, diagnosisManager);
     return diagnosisManager.getDiagnoses().stream()
         .filter(diagnosis -> diagnosis.getIdDiagnosis().equals(diagnosisId))
         .map(this::convertToVehicleDiagnosisDTO)
@@ -84,6 +91,9 @@ public class DiagnosisManagerService implements DiagnosisManagerServiceInterface
   @Transactional
   public boolean updateDiagnosis(Long diagnosisManagerId, Long diagnosisId, VehicleDiagnosisDTO updatedDiagnosisDto) {
     DiagnosisManager diagnosisManager = getDiagnosisManagerById(diagnosisManagerId);
+    diagnosisValidator.validateDiagnosisExists(diagnosisId, diagnosisManager);
+    diagnosisValidator.validateDiagnosisData(updatedDiagnosisDto);
+
     Optional<VehicleDiagnosis> diagnosisOptional = diagnosisManager.getDiagnoses().stream()
         .filter(diagnosis -> diagnosis.getIdDiagnosis().equals(diagnosisId))
         .findFirst();
