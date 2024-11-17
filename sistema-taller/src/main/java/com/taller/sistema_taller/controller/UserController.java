@@ -21,7 +21,8 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserAccount> registerUser(@Valid @RequestBody UserDTO userDto, @RequestParam String userType) {
+    public ResponseEntity<UserAccount> registerUser(@Valid @RequestBody UserDTO userDto,
+            @RequestParam String userType) {
         UserAccount createdUser = userService.registerUser(userDto, userType);
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
@@ -45,8 +46,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> authenticateUser(@Valid @RequestBody LoginDTO loginDto) {
-        userService.authenticateUser(loginDto);
-        return new ResponseEntity<>("Authentication successful", HttpStatus.OK);
+    public ResponseEntity<UserAccount> authenticateUser(@Valid @RequestBody LoginDTO loginDto) {
+        UserAccount authenticatedUser = userService.authenticateUser(loginDto);
+        return ResponseEntity.ok(authenticatedUser);
     }
 }

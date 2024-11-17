@@ -24,11 +24,10 @@ public class DiagnosisManagerController {
         this.clientVehicleService = clientVehicleService;
     }
 
-    @PostMapping("/user/{userId}")
+    @PostMapping("/{diagnosisManagerId}")
     public ResponseEntity<Void> addDiagnosis(
-            @PathVariable Long userId,
+            @PathVariable Long diagnosisManagerId,
             @RequestBody VehicleDiagnosisDTO diagnosisDto) {
-        Long diagnosisManagerId = clientVehicleService.getDiagnosisManagerByUserId(userId).getIdDiagnosisManager();
         diagnosisManagerService.addDiagnosis(diagnosisManagerId, diagnosisDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

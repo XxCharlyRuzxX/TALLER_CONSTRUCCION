@@ -82,8 +82,9 @@ public class UserService implements UserServiceInterface {
     }
 
     @Override
-    public boolean authenticateUser(LoginDTO loginDto) {
-        userValidator.validateLoginCredentials(loginDto.getEmail(), loginDto.getPassword());
-        return true;
+    public UserAccount authenticateUser(LoginDTO loginDto) {
+    return userAccountRepository.findByAccessCredentialsEmail(loginDto.getEmail())
+            .filter(user -> user.getAccessCredentials().validateCredentials(loginDto.getEmail(), loginDto.getPassword()))
+            .orElseThrow(() -> new UserNotFoundException("Invalid email or password"));
     }
 }

@@ -6,10 +6,12 @@ import com.taller.sistema_taller.model.UserAccounts.UserAccount;
 
 public interface UserServiceInterface {
   UserAccount registerUser(UserDTO userDto, String userType);
+
   UserAccount updateUser(Long id, UserDTO userDto);
+
   void deleteUser(Long id);
+
   UserAccount findUserById(Long id);
-  boolean authenticateUser(LoginDTO loginDto);
+
+  UserAccount authenticateUser(LoginDTO loginDto);
 }
-
-
