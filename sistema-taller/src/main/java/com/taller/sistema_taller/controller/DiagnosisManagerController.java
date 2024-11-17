@@ -15,13 +15,11 @@ import java.util.List;
 public class DiagnosisManagerController {
 
     private final DiagnosisManagerServiceInterface diagnosisManagerService;
-    private final ClientVehicleServiceInterface clientVehicleService;
 
     @Autowired
     public DiagnosisManagerController(DiagnosisManagerServiceInterface diagnosisManagerService,
             ClientVehicleServiceInterface clientVehicleService) {
         this.diagnosisManagerService = diagnosisManagerService;
-        this.clientVehicleService = clientVehicleService;
     }
 
     @PostMapping("/{diagnosisManagerId}")
@@ -32,59 +30,52 @@ public class DiagnosisManagerController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping("/user/{userId}/diagnosis/{diagnosisId}")
+    @GetMapping("/diagnosisManager/{diagnosisManagerId}/diagnosis/{diagnosisId}")
     public ResponseEntity<VehicleDiagnosisDTO> getDiagnosisById(
-            @PathVariable Long userId,
+            @PathVariable Long diagnosisManagerId,
             @PathVariable Long diagnosisId) {
-        Long diagnosisManagerId = clientVehicleService.getDiagnosisManagerByUserId(userId).getIdDiagnosisManager();
         VehicleDiagnosisDTO diagnosis = diagnosisManagerService.getDiagnosisById(diagnosisManagerId, diagnosisId);
         return ResponseEntity.ok(diagnosis);
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/diagnosisManager/{diagnosisManagerId}")
     public ResponseEntity<List<VehicleDiagnosisDTO>> getAllDiagnoses(
-            @PathVariable Long userId) {
-        Long diagnosisManagerId = clientVehicleService.getDiagnosisManagerByUserId(userId).getIdDiagnosisManager();
+            @PathVariable Long diagnosisManagerId) {
         return ResponseEntity.ok(diagnosisManagerService.getAllDiagnoses(diagnosisManagerId));
     }
 
-    @GetMapping("/user/{userId}/authorized")
+    @GetMapping("/diagnosisManager/{diagnosisManagerId}/authorized")
     public ResponseEntity<List<VehicleDiagnosisDTO>> getAuthorizedDiagnoses(
-            @PathVariable Long userId) {
-        Long diagnosisManagerId = clientVehicleService.getDiagnosisManagerByUserId(userId).getIdDiagnosisManager();
+            @PathVariable Long diagnosisManagerId) {
         return ResponseEntity.ok(diagnosisManagerService.getAuthorizedDiagnoses(diagnosisManagerId));
     }
 
-    @DeleteMapping("/user/{userId}/diagnosis/{diagnosisId}")
+    @DeleteMapping("/diagnosisManager/{diagnosisManagerId}/diagnosis/{diagnosisId}")
     public ResponseEntity<Void> removeDiagnosisById(
-            @PathVariable Long userId,
+            @PathVariable Long diagnosisManagerId,
             @PathVariable Long diagnosisId) {
-        Long diagnosisManagerId = clientVehicleService.getDiagnosisManagerByUserId(userId).getIdDiagnosisManager();
         boolean removed = diagnosisManagerService.removeDiagnosisById(diagnosisManagerId, diagnosisId);
         return removed ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/user/{userId}/diagnosis/{diagnosisId}")
+    @PutMapping("/diagnosisManager/{diagnosisManagerId}/diagnosis/{diagnosisId}")
     public ResponseEntity<Void> updateDiagnosis(
-            @PathVariable Long userId,
+            @PathVariable Long diagnosisManagerId,
             @PathVariable Long diagnosisId,
             @RequestBody VehicleDiagnosisDTO updatedDiagnosisDto) {
-        Long diagnosisManagerId = clientVehicleService.getDiagnosisManagerByUserId(userId).getIdDiagnosisManager();
         boolean updated = diagnosisManagerService.updateDiagnosis(diagnosisManagerId, diagnosisId, updatedDiagnosisDto);
         return updated ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/user/{userId}/total-cost")
+    @GetMapping("/diagnosisManager/{diagnosisManagerId}/total-cost")
     public ResponseEntity<Float> calculateTotalDiagnosisCost(
-            @PathVariable Long userId) {
-        Long diagnosisManagerId = clientVehicleService.getDiagnosisManagerByUserId(userId).getIdDiagnosisManager();
+            @PathVariable Long diagnosisManagerId) {
         return ResponseEntity.ok(diagnosisManagerService.calculateTotalDiagnosisCost(diagnosisManagerId));
     }
 
-    @GetMapping("/user/{userId}/authorized-cost")
+    @GetMapping("/diagnosisManager/{diagnosisManagerId}/authorized-cost")
     public ResponseEntity<Float> calculateAuthorizedDiagnosisCost(
-            @PathVariable Long userId) {
-        Long diagnosisManagerId = clientVehicleService.getDiagnosisManagerByUserId(userId).getIdDiagnosisManager();
+            @PathVariable Long diagnosisManagerId) {
         return ResponseEntity.ok(diagnosisManagerService.calculateAuthorizedDiagnosisCost(diagnosisManagerId));
     }
 }

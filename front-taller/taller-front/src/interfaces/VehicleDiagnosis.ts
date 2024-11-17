@@ -5,7 +5,6 @@ export interface VehicleDiagnosis {
   problemDetail: string;
   maintenanceCost: number;
   evaluationDate: string;
-  isAuthorized: boolean;
+  authorized: boolean;
   partsList: PartDiagnosis[];
-  getTotalCost(): number;
 }
