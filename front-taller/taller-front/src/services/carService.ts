@@ -21,11 +21,22 @@ export const registerVehicle = async (vehicleData: ClientVehicleDTO): Promise<Cl
   }
 };
 
-export const getClientVehiclesById = async (clientId: number): Promise<ClientVehicle[]> => {
+export const getClientVehiclesByCleintId = async (clientId: number): Promise<ClientVehicle[]> => {
   try {
     const response = await api.get<ClientVehicle[]>(`/vehicles/client/${clientId}`);
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Error al obtener los vehículos");
+  }
+};
+
+export const getVehicleByVehicleId = async (vehicleId: string): Promise<ClientVehicle> => {
+  try {
+    const response = await api.get<ClientVehicle>(`/vehicles/${vehicleId}`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Error al obtener los datos del vehículo."
+    );
   }
 };

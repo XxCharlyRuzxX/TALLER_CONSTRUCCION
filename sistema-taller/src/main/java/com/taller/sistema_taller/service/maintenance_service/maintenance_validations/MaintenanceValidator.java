@@ -16,8 +16,6 @@ public class MaintenanceValidator {
         if (advanceDTO.getDescription() == null || advanceDTO.getDescription().isEmpty()) {
             throw new InvalidMaintenanceAdvanceException("Description cannot be empty.");
         }
-
-        validateImages(advanceDTO.getImagesAdvance());
     }
 
     public void validateStatus(String status) {

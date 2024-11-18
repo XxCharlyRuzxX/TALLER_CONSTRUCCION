@@ -36,7 +36,7 @@ public class MaintenanceManagerService implements MaintenanceManagerServiceInter
         maintenanceValidator.validateAdvance(advanceDTO);
 
         MaintenanceAdvance advance = new MaintenanceAdvance(advanceDTO.getDate(), advanceDTO.getDescription());
-        advanceDTO.getImagesAdvance().forEach(advance::addImage);
+        //advanceDTO.getImagesAdvance().forEach(advance::addImage);
 
         manager.getMaintenanceProgresses().add(advance);
         maintenanceManagerRepository.save(manager);

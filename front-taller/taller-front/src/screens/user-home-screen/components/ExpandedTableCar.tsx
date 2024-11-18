@@ -23,9 +23,9 @@ export const ExpandableTableCard: React.FC<ExpandableTableProps> = ({
   title,
   onAddCar,
 }) => {
-  const [expanded, setExpanded] = useState<boolean>(false);
+  const [expanded, setExpanded] = useState<boolean>(true);
   const [page, setPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(2);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -83,7 +83,7 @@ export const ExpandableTableCard: React.FC<ExpandableTableProps> = ({
         </div>
       </AccordionSummary>
       <AccordionDetails
-        sx={{ backgroundColor: Colors.PrimaryGray, borderRadius: "0" }}
+        sx={{ backgroundColor: Colors.White, borderRadius: "0" }}
       >
         <CarTable
           cars={cars}

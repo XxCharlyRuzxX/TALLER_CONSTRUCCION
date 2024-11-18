@@ -19,7 +19,6 @@ const GeneralVehicleData: React.FC<GeneralVehicleDataProps> = ({ vehicle }) => {
         borderRadius: 2,
       }}
     >
-      {/* Icono del vehículo */}
       <Box
         sx={{
           width: 120,
@@ -27,7 +26,7 @@ const GeneralVehicleData: React.FC<GeneralVehicleDataProps> = ({ vehicle }) => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: Colors.HighlightGray,
+          backgroundColor: Colors.DarkBlue,
           borderRadius: "10%",
           marginRight: 3,
         }}
@@ -35,7 +34,6 @@ const GeneralVehicleData: React.FC<GeneralVehicleDataProps> = ({ vehicle }) => {
         <TimeToLeaveIcon sx={{ fontSize: 70, color: Colors.White }} />
       </Box>
 
-      {/* Datos del vehículo organizados en columnas */}
       <Box sx={{ flex: 1 }}>
         <Grid container spacing={2}>
           <Grid item xs={4}>
