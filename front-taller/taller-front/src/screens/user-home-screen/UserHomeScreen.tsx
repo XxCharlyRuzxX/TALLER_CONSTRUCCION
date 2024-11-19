@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Box, Typography, Avatar } from "@mui/material";
 import { PageItemPaper } from "../../components/PageItemPaper";
 import { Colors } from "../../utils/Colors";
-import ConstructionIcon from "@mui/icons-material/Construction";
 import { UserAccount } from "../../interfaces/UserAccount";
 import { ClientVehicle } from "../../interfaces/ClientVehicle";
 import { getClientVehiclesByCleintId } from "../../services/carService";
 import ExpandableTableCard from "./components/ExpandedTableCar";
 import RegisterVehicleModal from "./components/RegisterVehicleModal";
+import taller from "../../../public/taller.svg";
 
 const UserHomePage: React.FC = () => {
   const [user, setUser] = useState<UserAccount | null>(null);
@@ -67,12 +67,13 @@ const UserHomePage: React.FC = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          gap: 2,
         }}
       >
         <Typography variant="h5" sx={{ color: Colors.White}}>
           BIENVENIDO A MI TALLER
         </Typography>
-        <ConstructionIcon sx={{ color: Colors.White, fontSize: 40, ml: 2 }} />
+        <img src={taller} alt="taller" style={{width: "5vh"}}/>
       </Box>
 
       <PageItemPaper sx={{ width: "80%", mt: 4, minHeight: "400px" }}>
