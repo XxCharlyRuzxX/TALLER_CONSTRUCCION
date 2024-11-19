@@ -12,7 +12,7 @@ public class FinalProcessReport {
     private final Date finalizationDate;
 
     public FinalProcessReport(List<VehicleDiagnosis> vehicleDiagnoses, List<MaintenanceAdvance> advances,
-            float totalCost, Date finalizationDate) {
+        float totalCost, Date finalizationDate) {
         this.vehicleDiagnoses = vehicleDiagnoses;
         this.advances = advances;
         this.totalCost = totalCost;

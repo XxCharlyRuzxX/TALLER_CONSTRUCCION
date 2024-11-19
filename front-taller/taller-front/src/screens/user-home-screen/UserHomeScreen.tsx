@@ -8,7 +8,6 @@ import { ClientVehicle } from "../../interfaces/ClientVehicle";
 import { getClientVehiclesByCleintId } from "../../services/carService";
 import ExpandableTableCard from "./components/ExpandedTableCar";
 import RegisterVehicleModal from "./components/RegisterVehicleModal";
-import taller from "../../../public/taller.svg";
 
 const UserHomePage: React.FC = () => {
   const [user, setUser] = useState<UserAccount | null>(null);
@@ -73,7 +72,7 @@ const UserHomePage: React.FC = () => {
         <Typography variant="h5" sx={{ color: Colors.White}}>
           BIENVENIDO A MI TALLER
         </Typography>
-        <img src={taller} alt="taller" style={{width: "5vh"}}/>
+        <img src="/taller.svg" alt="taller" style={{width: "5vh"}}/>
       </Box>
 
       <PageItemPaper sx={{ width: "80%", mt: 4, minHeight: "400px" }}>
