@@ -13,4 +13,5 @@ public interface ClientVehicleServiceInterface {
     ClientVehicle findVehicleById(String vehicleId);
     List<ClientVehicle> findAllVehiclesByClient(Long clientId);
     DiagnosisManager getDiagnosisManagerByUserId(Long userId);
+    List<ClientVehicle> findAllVehicles();
 }

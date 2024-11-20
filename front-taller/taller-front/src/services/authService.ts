@@ -13,6 +13,10 @@ export interface RegisterDTO {
     password: string,
 }
 
+export interface UserTypeResponse {
+  type: "Admin" | "Client" | "Worker";
+}
+
 
 export const login = async (loginData: LoginDTO): Promise<UserAccount> => {
   try {
@@ -28,5 +32,19 @@ export const registerUser = async (registrationData: RegisterDTO): Promise<void>
     await api.post("/users/register?userType=client", registrationData);
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Error en el registro");
+  }
+};
+
+export const getUserType = async (userId: number): Promise<UserTypeResponse> => {
+  try {
+    const response = await api.get<string>(`users/${userId}/type`);
+    const userType = response.data.trim();
+    if (userType === "Admin" || userType === "Client" || userType === "Worker") {
+      return { type: userType } as UserTypeResponse;
+    } else {
+      throw new Error("Tipo de usuario no reconocido");
+    }
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Error al obtener el tipo de usuario");
   }
 };

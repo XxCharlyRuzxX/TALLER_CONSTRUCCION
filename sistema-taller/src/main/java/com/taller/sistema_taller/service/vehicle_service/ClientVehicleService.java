@@ -23,7 +23,8 @@ public class ClientVehicleService implements ClientVehicleServiceInterface {
     private final ClientVehicleValidator clientVehicleValidator;
 
     @Autowired
-    public ClientVehicleService(ClientVehicleRepository clientVehicleRepository, ClientVehicleValidator clientVehicleValidator) {
+    public ClientVehicleService(ClientVehicleRepository clientVehicleRepository,
+            ClientVehicleValidator clientVehicleValidator) {
         this.clientVehicleRepository = clientVehicleRepository;
         this.clientVehicleValidator = clientVehicleValidator;
     }
@@ -33,18 +34,17 @@ public class ClientVehicleService implements ClientVehicleServiceInterface {
     public ClientVehicle registerVehicle(ClientVehicleDTO vehicleDto) {
         clientVehicleValidator.validateClientVehicleData(vehicleDto);
         clientVehicleValidator.validateLicensePlateUniqueness(vehicleDto.getLicensePlate());
+        clientVehicleValidator.validateClientVehicleData(vehicleDto);
 
         StaticVehicleData staticData = new StaticVehicleData(
                 vehicleDto.getBrand(),
                 vehicleDto.getModel(),
                 vehicleDto.getYear(),
-                vehicleDto.getLicensePlate()
-        );
+                vehicleDto.getLicensePlate());
         NonStaticVehicleData nonStaticData = new NonStaticVehicleData(
                 vehicleDto.getMileage(),
                 vehicleDto.getFuelLevel(),
-                vehicleDto.getAdditionalObservations()
-        );
+                vehicleDto.getAdditionalObservations());
 
         ClientVehicle newVehicle = new ClientVehicle(vehicleDto.getClientId(), staticData, nonStaticData);
         return clientVehicleRepository.save(newVehicle);
@@ -54,6 +54,7 @@ public class ClientVehicleService implements ClientVehicleServiceInterface {
     @Transactional
     public ClientVehicle updateVehicle(String vehicleId, ClientVehicleDTO vehicleDto) {
         clientVehicleValidator.validateVehicleExists(vehicleId);
+        clientVehicleValidator.validateClientVehicleData(vehicleDto);
 
         ClientVehicle existingVehicle = clientVehicleRepository.findById(vehicleId)
                 .orElseThrow(() -> new VehicleNotFoundException("Vehículo con ID " + vehicleId + " no encontrado"));
@@ -62,15 +63,13 @@ public class ClientVehicleService implements ClientVehicleServiceInterface {
                 vehicleDto.getBrand(),
                 vehicleDto.getModel(),
                 vehicleDto.getYear(),
-                vehicleDto.getLicensePlate()
-        );
+                vehicleDto.getLicensePlate());
         existingVehicle.updateStaticVehicleData(updatedStaticData);
 
         NonStaticVehicleData updatedNonStaticData = new NonStaticVehicleData(
                 vehicleDto.getMileage(),
                 vehicleDto.getFuelLevel(),
-                vehicleDto.getAdditionalObservations()
-        );
+                vehicleDto.getAdditionalObservations());
         existingVehicle.updateNonStaticVehicleData(updatedNonStaticData);
 
         return clientVehicleRepository.save(existingVehicle);
@@ -97,7 +96,14 @@ public class ClientVehicleService implements ClientVehicleServiceInterface {
 
     public DiagnosisManager getDiagnosisManagerByUserId(Long userId) {
         return clientVehicleRepository.findByClientId(userId)
-            .map(ClientVehicle::getDiagnosisManager)
-            .orElseThrow(() -> new VehicleNotFoundException("Diagnóstico no encontrado para el usuario con ID " + userId));
+                .map(ClientVehicle::getDiagnosisManager)
+                .orElseThrow(() -> new VehicleNotFoundException(
+                        "Diagnóstico no encontrado para el usuario con ID " + userId));
     }
+
+    @Override
+    public List<ClientVehicle> findAllVehicles() {
+        return clientVehicleRepository.findAll();
+    }
+
 }

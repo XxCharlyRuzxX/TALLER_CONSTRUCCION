@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, TextField, Typography, Box, Link } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { login } from "../../services/authService";
+import { login, getUserType } from "../../services/authService";
 import { UserAccount } from "../../interfaces/UserAccount";
 
 const LoginPage: React.FC = () => {
@@ -13,12 +13,36 @@ const LoginPage: React.FC = () => {
   const handleLogin = async () => {
     try {
       setError(null);
-      const loginData = { email, password };
-      const user: UserAccount = await login(loginData);
-      localStorage.setItem("user", JSON.stringify(user));
-      navigate("/userHome");
+      const user = await authenticateUser(email, password);
+      await handleUserRedirection(user);
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Error en el inicio de sesión");
+    }
+  };
+
+  const authenticateUser = async (email: string, password: string): Promise<UserAccount> => {
+    const loginData = { email, password };
+    const user: UserAccount = await login(loginData);
+    localStorage.setItem("user", JSON.stringify(user));
+    return user;
+  };
+
+  const handleUserRedirection = async (user: UserAccount) => {
+    const userTypeResponse = await getUserType(user.userId);
+    const userType = userTypeResponse.type;
+
+    switch (userType) {
+      case "Admin":
+        navigate("/homeadmin");
+        break;
+      case "Client":
+        navigate("/userHome");
+        break;
+      case "Worker":
+        navigate("/workerHome");
+        break;
+      default:
+        throw new Error("Tipo de usuario no reconocido");
     }
   };
 
@@ -55,7 +79,7 @@ const LoginPage: React.FC = () => {
           BIENVENIDO NUEVAMENTE
         </Typography>
         <Typography variant="subtitle1" align="center" gutterBottom>
-          INICIA SECCIÓN PARA CONTINUAR
+          INICIA SESIÓN PARA CONTINUAR
         </Typography>
 
         <Box
@@ -104,15 +128,15 @@ const LoginPage: React.FC = () => {
             justifyContent="space-between"
             sx={{ mt: 2, width: "80%" }}
           >
-             <Link
+            <Link
               component="button"
               variant="body2"
               onClick={handleNavigateToRegister}
             >
               Crear mi cuenta
             </Link>
-            <Link variant="body2" onClick={()=> alert("Servicio no disponible")}>
-              Hé olvidado mi contraseña
+            <Link variant="body2" onClick={() => alert("Servicio no disponible")}>
+              He olvidado mi contraseña
             </Link>
           </Box>
         </Box>

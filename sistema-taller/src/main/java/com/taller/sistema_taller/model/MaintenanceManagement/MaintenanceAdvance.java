@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class MaintenanceAdvance {
     @Id
@@ -13,6 +15,7 @@ public class MaintenanceAdvance {
     private Date date;
     private String description;
 
+    @JsonIgnore
     @ElementCollection
     @Lob
     private List<String> imagesAdvance = new ArrayList<>();
