@@ -1,29 +1,42 @@
 import React, { useState } from "react";
 import { Button, TextField, Typography, Box, Link } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { login } from "../../services/authService";
-import { UserAccount } from "../../interfaces/UserAccount";
+import { registerUser } from "../../services/authService";
+import { RegisterDTO } from "../../services/authService";
 
-const LoginPage: React.FC = () => {
+const RegisterPage: React.FC = () => {
+  const [userName, setUserName] = useState("");
+  const [phone, setPhone] = useState<string>("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
+    if (password !== confirmPassword) {
+      setError("Las contraseñas no coinciden.");
+      return;
+    }
+
     try {
       setError(null);
-      const loginData = { email, password };
-      const user: UserAccount = await login(loginData);
-      localStorage.setItem("user", JSON.stringify(user));
-      navigate("/userHome");
-    } catch (err: any) {
-      setError(err.message);
-    }
-  };
+      setSuccessMessage(null);
 
-  const handleNavigateToRegister = () => {
-    navigate("/register");
+      const registrationData: RegisterDTO = {
+        userName,
+        phone: parseInt(phone, 10),
+        email,
+        password,
+      };
+
+      await registerUser(registrationData);
+      setSuccessMessage("Registro exitoso. Redirigiendo al inicio de sesión...");
+      setTimeout(() => navigate("/login"), 2000);
+    } catch (err: any) {
+      setError(err.message || "Error al registrarse.");
+    }
   };
 
   return (
@@ -44,7 +57,6 @@ const LoginPage: React.FC = () => {
           borderRadius: "8px",
           boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
           width: "600px",
-          height: "500px",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -52,10 +64,10 @@ const LoginPage: React.FC = () => {
         }}
       >
         <Typography variant="h5" align="center" gutterBottom>
-          BIENVENIDO NUEVAMENTE
+          CREAR UNA CUENTA
         </Typography>
         <Typography variant="subtitle1" align="center" gutterBottom>
-          INICIA SECCIÓN PARA CONTINUAR
+          COMPLETA TUS DATOS PARA REGISTRARTE
         </Typography>
 
         <Box
@@ -68,6 +80,23 @@ const LoginPage: React.FC = () => {
             width: "100%",
           }}
         >
+          <TextField
+            sx={{ width: "80%" }}
+            label="Nombre Completo"
+            variant="outlined"
+            margin="normal"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+          />
+          <TextField
+            sx={{ width: "80%" }}
+            label="Teléfono"
+            type="tel"
+            variant="outlined"
+            margin="normal"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
           <TextField
             sx={{ width: "80%" }}
             label="Correo Electrónico"
@@ -85,34 +114,41 @@ const LoginPage: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          <TextField
+            sx={{ width: "80%" }}
+            label="Confirmar Contraseña"
+            type="password"
+            variant="outlined"
+            margin="normal"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
           {error && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
               {error}
+            </Typography>
+          )}
+          {successMessage && (
+            <Typography color="success" variant="body2" sx={{ mt: 1 }}>
+              {successMessage}
             </Typography>
           )}
           <Button
             variant="contained"
             color="primary"
             sx={{ mt: 2, mb: 2, width: "50%" }}
-            onClick={handleLogin}
-            disabled={!email || !password}
+            onClick={handleRegister}
+            disabled={!userName || !phone || !email || !password || !confirmPassword}
           >
-            Ingresar
+            Registrarme
           </Button>
           <Box
             display="flex"
-            justifyContent="space-between"
+            justifyContent="center"
             sx={{ mt: 2, width: "80%" }}
           >
-             <Link
-              component="button"
-              variant="body2"
-              onClick={handleNavigateToRegister}
-            >
-              Crear mi cuenta
-            </Link>
-            <Link variant="body2" onClick={()=> alert("Servicio no disponible")}>
-              Hé olvidado mi contraseña
+            <Link href="/login" variant="body2">
+              ¿Ya tienes una cuenta? Inicia sesión
             </Link>
           </Box>
         </Box>
@@ -121,4 +157,4 @@ const LoginPage: React.FC = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;

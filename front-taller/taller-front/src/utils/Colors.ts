@@ -6,6 +6,9 @@ export const Colors = {
   HighlightGreen: '#4CAF50',
   HighlightRed: '#F44336',
   HighlightOrange: '#FF9800',
+  HighlightYellow: '#FFEB3B',
+  HighlightBlue: '#2196F3',
+  DarkBlue: '#1976D2',
 }
 
 export default Colors;

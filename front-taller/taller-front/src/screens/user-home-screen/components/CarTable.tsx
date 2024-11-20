@@ -11,6 +11,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import TimeToLeaveIcon from "@mui/icons-material/TimeToLeave";
 import { ClientVehicle } from "../../../interfaces/ClientVehicle";
+import Colors from "../../../utils/Colors";
 
 interface CarTableProps {
   cars: ClientVehicle[];
@@ -75,7 +76,7 @@ const CarTable: React.FC<CarTableProps> = ({
                 onClick={() => handleRowClick(car)}
               >
                 <TableCell align="center">
-                  <TimeToLeaveIcon sx={{ mr: 1, fontSize: 30, color: "gray" }} />
+                  <TimeToLeaveIcon sx={{ mr: 1, fontSize: 30, color: Colors.HighlightBlue }} />
                 </TableCell>
                 <TableCell align="center">
                   {car.staticVehicleData.licensePlate}
@@ -93,7 +94,7 @@ const CarTable: React.FC<CarTableProps> = ({
                   {car.nonStaticVehicleData.mileage} km
                 </TableCell>
                 <TableCell align="center">
-                  {Math.round(car.nonStaticVehicleData.fuelLevel * 100)}%
+                  {Math.round(car.nonStaticVehicleData.fuelLevel)}%
                 </TableCell>
                 <TableCell align="center">
                   {car.diagnosisManager.diagnoses.length}

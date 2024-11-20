@@ -3,10 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Box, Typography, Avatar } from "@mui/material";
 import { PageItemPaper } from "../../components/PageItemPaper";
 import { Colors } from "../../utils/Colors";
-import ConstructionIcon from "@mui/icons-material/Construction";
 import { UserAccount } from "../../interfaces/UserAccount";
 import { ClientVehicle } from "../../interfaces/ClientVehicle";
-import { getClientVehiclesById } from "../../services/carService";
+import { getClientVehiclesByCleintId } from "../../services/carService";
 import ExpandableTableCard from "./components/ExpandedTableCar";
 import RegisterVehicleModal from "./components/RegisterVehicleModal";
 
@@ -29,7 +28,7 @@ const UserHomePage: React.FC = () => {
 
   const loadClientVehicles = async (userId: number) => {
     try {
-      const fetchedVehicles = await getClientVehiclesById(userId);
+      const fetchedVehicles = await getClientVehiclesByCleintId(userId);
       setVehicles(fetchedVehicles);
     } catch (err) {
       console.error("Error al cargar los vehículos:", err);
@@ -67,17 +66,18 @@ const UserHomePage: React.FC = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          gap: 2,
         }}
       >
-        <Typography variant="h5" sx={{ color: "white" }}>
+        <Typography variant="h5" sx={{ color: Colors.White}}>
           BIENVENIDO A MI TALLER
         </Typography>
-        <ConstructionIcon sx={{ color: Colors.HighlightRed, fontSize: 40, ml: 2 }} />
+        <img src="/taller.svg" alt="taller" style={{width: "5vh"}}/>
       </Box>
 
       <PageItemPaper sx={{ width: "80%", mt: 4, minHeight: "400px" }}>
         <Box display="flex" alignItems="center">
-          <Avatar sx={{ width: 56, height: 56 }}>U</Avatar>
+          <Avatar sx={{ width: 56, height: 56 , backgroundColor: Colors.HighlightBlue}}>{user.userName.charAt(0)}</Avatar>
           <Box ml={2}>
             <Typography variant="h6">{user.userName}</Typography>
             <Typography variant="body2" color="textSecondary">

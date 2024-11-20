@@ -67,14 +67,16 @@
 </dependency>
 
 </dependencies>
-
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <configuration>
+                <mainClass>com.taller.sistema_taller.SistemaTallerApplication</mainClass>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
 
 </project>

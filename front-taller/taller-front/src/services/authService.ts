@@ -1,10 +1,18 @@
 import { UserAccount } from "../interfaces/UserAccount";
 import api from "./api/apiConfig";
 
-interface LoginDTO {
+export interface LoginDTO {
   email: string;
   password: string;
 }
+
+export interface RegisterDTO {
+    userName: string,
+    phone: number,
+    email: string,
+    password: string,
+}
+
 
 export const login = async (loginData: LoginDTO): Promise<UserAccount> => {
   try {
@@ -15,3 +23,10 @@ export const login = async (loginData: LoginDTO): Promise<UserAccount> => {
   }
 };
 
+export const registerUser = async (registrationData: RegisterDTO): Promise<void> => {
+  try {
+    await api.post("/users/register?userType=client", registrationData);
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Error en el registro");
+  }
+};

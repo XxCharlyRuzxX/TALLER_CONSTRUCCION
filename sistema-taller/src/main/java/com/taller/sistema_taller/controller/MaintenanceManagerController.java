@@ -2,7 +2,7 @@ package com.taller.sistema_taller.controller;
 
 import com.taller.sistema_taller.dto.MaintenanceAdvanceDTO;
 import com.taller.sistema_taller.dto.MaintenanceManagerDTO;
-import com.taller.sistema_taller.service.maintenance_service.interfaces.MaintenanceManagerServiceInterface;
+import com.taller.sistema_taller.service.maintenance_service.MaintenanceManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/maintenance")
 public class MaintenanceManagerController {
 
-    private final MaintenanceManagerServiceInterface maintenanceManagerService;
+    private final MaintenanceManagerService maintenanceManagerService;
 
     @Autowired
-    public MaintenanceManagerController(MaintenanceManagerServiceInterface maintenanceManagerService) {
+    public MaintenanceManagerController(MaintenanceManagerService maintenanceManagerService) {
         this.maintenanceManagerService = maintenanceManagerService;
     }
 
