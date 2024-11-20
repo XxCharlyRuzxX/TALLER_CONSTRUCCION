@@ -14,4 +14,7 @@ public interface UserServiceInterface {
   UserAccount findUserById(Long id);
 
   UserAccount authenticateUser(LoginDTO loginDto);
+
+  String findUserTypeById(Long id);
+
 }

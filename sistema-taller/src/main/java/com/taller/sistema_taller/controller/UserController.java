@@ -50,4 +50,11 @@ public class UserController {
         UserAccount authenticatedUser = userService.authenticateUser(loginDto);
         return ResponseEntity.ok(authenticatedUser);
     }
+
+    @GetMapping("/{id}/type")
+    public ResponseEntity<String> getUserType(@PathVariable Long id) {
+        String userType = userService.findUserTypeById(id);
+        return ResponseEntity.ok(userType);
+    }
+
 }

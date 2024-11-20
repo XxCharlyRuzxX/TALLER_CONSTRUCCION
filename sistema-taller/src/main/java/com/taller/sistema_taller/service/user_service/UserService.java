@@ -88,4 +88,25 @@ public class UserService implements UserServiceInterface {
             .filter(user -> user.getAccessCredentials().validateCredentials(loginDto.getEmail(), loginDto.getPassword()))
             .orElseThrow(() -> new UserNotFoundException("Invalid email or password"));
     }
+
+    @Override
+    public String findUserTypeById(Long id) {
+        userValidator.validateUserExists(id);
+
+        UserAccount userAccount = userAccountRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
+
+        return determineUserType(userAccount);
+    }
+    private String determineUserType(UserAccount userAccount) {
+        if (userAccount instanceof AdminAccount) {
+            return "Admin";
+        } else if (userAccount instanceof ClientAccount) {
+            return "Client";
+        } else if (userAccount instanceof WorkerAccount) {
+            return "Worker";
+        } else {
+            throw new IllegalStateException("Tipo de usuario no reconocido para el ID");
+        }
+    }
 }
