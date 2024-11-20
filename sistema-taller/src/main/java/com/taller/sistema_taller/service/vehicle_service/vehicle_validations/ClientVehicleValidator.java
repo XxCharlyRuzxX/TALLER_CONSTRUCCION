@@ -58,7 +58,7 @@ public class ClientVehicleValidator {
     }
 
     private static void validateVehicleLicensePlate(String licensePlate) {
-        if (licensePlate == null || licensePlate.length() != 9) {
+        if (licensePlate == null || licensePlate.length() == 6) {
             throw new InvalidVehicleDataException("La matrícula debe contener 9 caracteres");
         }
     }
