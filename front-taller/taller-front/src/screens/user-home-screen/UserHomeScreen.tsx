@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Typography, Avatar } from "@mui/material";
+import { Box, Typography, Avatar, CircularProgress } from "@mui/material";
 import { PageItemPaper } from "../../components/PageItemPaper";
 import { Colors } from "../../utils/Colors";
 import { UserAccount } from "../../interfaces/UserAccount";
@@ -12,6 +12,7 @@ import RegisterVehicleModal from "./components/RegisterVehicleModal";
 const UserHomePage: React.FC = () => {
   const [user, setUser] = useState<UserAccount | null>(null);
   const [vehicles, setVehicles] = useState<ClientVehicle[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -27,11 +28,14 @@ const UserHomePage: React.FC = () => {
   }, [navigate]);
 
   const loadClientVehicles = async (userId: number) => {
+    setLoading(true);
     try {
       const fetchedVehicles = await getClientVehiclesByCleintId(userId);
       setVehicles(fetchedVehicles);
     } catch (err) {
       console.error("Error al cargar los vehículos:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -47,6 +51,23 @@ const UserHomePage: React.FC = () => {
   };
 
   if (!user) return null;
+
+  if (loading) {
+    // Mostrar el ícono de carga mientras los datos están cargando
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "100vh",
+          backgroundColor: "#F5F1F1",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -69,15 +90,23 @@ const UserHomePage: React.FC = () => {
           gap: 2,
         }}
       >
-        <Typography variant="h5" sx={{ color: Colors.White}}>
+        <Typography variant="h5" sx={{ color: Colors.White }}>
           BIENVENIDO A MI TALLER
         </Typography>
-        <img src="/taller.svg" alt="taller" style={{width: "5vh"}}/>
+        <img src="/taller.svg" alt="taller" style={{ width: "5vh" }} />
       </Box>
 
       <PageItemPaper sx={{ width: "80%", mt: 4, minHeight: "400px" }}>
         <Box display="flex" alignItems="center">
-          <Avatar sx={{ width: 56, height: 56 , backgroundColor: Colors.HighlightBlue}}>{user.userName.charAt(0)}</Avatar>
+          <Avatar
+            sx={{
+              width: 56,
+              height: 56,
+              backgroundColor: Colors.HighlightBlue,
+            }}
+          >
+            {user.userName.charAt(0)}
+          </Avatar>
           <Box ml={2}>
             <Typography variant="h6">{user.userName}</Typography>
             <Typography variant="body2" color="textSecondary">
@@ -86,7 +115,11 @@ const UserHomePage: React.FC = () => {
           </Box>
         </Box>
         <Box sx={{ paddingTop: 2 }}>
-          <ExpandableTableCard cars={vehicles} title="Mis Vehículos" onAddCar={handleAddCar}/>
+          <ExpandableTableCard
+            cars={vehicles}
+            title="Mis Vehículos"
+            onAddCar={handleAddCar}
+          />
         </Box>
       </PageItemPaper>
       <RegisterVehicleModal
