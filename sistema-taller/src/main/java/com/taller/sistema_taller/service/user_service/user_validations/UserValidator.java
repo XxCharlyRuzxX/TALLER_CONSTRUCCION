@@ -2,6 +2,7 @@ package com.taller.sistema_taller.service.user_service.user_validations;
 
 import org.springframework.stereotype.Component;
 
+import com.taller.sistema_taller.dto.UserDTO;
 import com.taller.sistema_taller.exceptions.user_exceptions.InvalidCredentialsException;
 import com.taller.sistema_taller.exceptions.user_exceptions.InvalidDataException;
 import com.taller.sistema_taller.exceptions.user_exceptions.InvalidUserTypeException;
@@ -40,6 +41,26 @@ public class UserValidator {
                 .anyMatch(user -> user.getAccessCredentials().validateCredentials(email, password));
         if (!isValid) {
             throw new InvalidCredentialsException("Credenciales inválidas");
+        }
+    }
+
+    public void validateUserData(UserDTO userDTO) {
+        if (userDTO == null) {
+            throw new InvalidDataException("El usuario no puede ser nulo.");
+        }
+        validatePassword(userDTO.getPassword());
+        validateUserPhone(userDTO.getPhone());
+    }
+
+    private void validatePassword(String password) {
+        if (password == null || password.length() < 8) {
+            throw new InvalidDataException("La contraseña debe contener al menos 8 caracteres");
+        }
+    }
+
+    private void validateUserPhone(String phone) {
+        if (phone == null || phone.length() != 10 || !phone.matches("\\d+")) {
+            throw new InvalidDataException("El teléfono debe tener exactamente 10 caracteres numéricos");
         }
     }
 }

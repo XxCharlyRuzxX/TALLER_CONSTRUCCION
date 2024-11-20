@@ -31,6 +31,7 @@ public class ClientVehicleService implements ClientVehicleServiceInterface {
     @Override
     @Transactional
     public ClientVehicle registerVehicle(ClientVehicleDTO vehicleDto) {
+        clientVehicleValidator.validateClientVehicleData(vehicleDto);
         clientVehicleValidator.validateLicensePlateUniqueness(vehicleDto.getLicensePlate());
 
         StaticVehicleData staticData = new StaticVehicleData(

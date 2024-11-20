@@ -33,6 +33,7 @@ public class UserService implements UserServiceInterface {
     @Override
     @Transactional
     public UserAccount registerUser(UserDTO userDto, String userType) {
+        userValidator.validateUserData(userDto);
         userValidator.validateUserType(userType);
         userValidator.validateEmailUniqueness(userDto.getEmail());
 
