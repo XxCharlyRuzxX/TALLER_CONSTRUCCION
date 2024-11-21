@@ -40,8 +40,6 @@ const SummarySection: React.FC<SummarySectionProps> = ({
           ${totalToPay.toFixed(2)}
         </Typography>
       </Box>
-
-      {/* Botones */}
       <Box
         sx={{
           display: "flex",
@@ -58,10 +56,10 @@ const SummarySection: React.FC<SummarySectionProps> = ({
             "&:hover": {
               backgroundColor: Colors.DarkBlue,
             },
-            minWidth: "300px",
+            minWidth: "350px",
           }}
         >
-          Solicitar Reporte de Mantenimiento
+          Descargar Reporte General
         </Button>
 
         <Button

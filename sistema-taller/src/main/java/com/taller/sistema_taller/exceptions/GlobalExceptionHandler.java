@@ -15,6 +15,7 @@ import com.taller.sistema_taller.exceptions.maintenance_exceptions.MaintenanceAd
 import com.taller.sistema_taller.exceptions.maintenance_exceptions.MaintenanceManagerNotFoundException;
 import com.taller.sistema_taller.exceptions.part_diagnosis_exceptions.InvalidPartDataException;
 import com.taller.sistema_taller.exceptions.part_diagnosis_exceptions.PartNotFoundException;
+import com.taller.sistema_taller.exceptions.survey_exceptions.SurveyValidationException;
 import com.taller.sistema_taller.exceptions.user_exceptions.*;
 import com.taller.sistema_taller.exceptions.vehicle_exceptions.DuplicateLicensePlateException;
 import com.taller.sistema_taller.exceptions.vehicle_exceptions.InvalidVehicleDataException;
@@ -110,6 +111,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidImageFormatException.class)
     public ResponseEntity<String> handleInvalidImageFormat(InvalidImageFormatException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    // Survey exceptions
+    @ExceptionHandler(SurveyValidationException.class)
+    public ResponseEntity<String> handleValidationException(SurveyValidationException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 

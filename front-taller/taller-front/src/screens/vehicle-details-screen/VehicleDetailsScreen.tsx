@@ -13,6 +13,9 @@ import { PageItemPaper } from "../../components/PageItemPaper";
 import { VehicleDiagnosis } from "../../interfaces/VehicleDiagnosis";
 import { updateMaintenanceStatus } from "../../services/maintenanceService";
 import { MaintenanceStatus } from "../../interfaces/MaintenanceManager";
+import { ReportType, generateReport } from "../../services/reportService";
+import SurveyModal from "./components/SurveyModal";
+import { createSurvey } from "../../services/surveyService";
 
 const VehicleDetailsScreen: React.FC = () => {
   const { idVehicle } = useParams<{ idVehicle: string }>();
@@ -20,12 +23,34 @@ const VehicleDetailsScreen: React.FC = () => {
 
   const [vehicle, setVehicle] = useState<ClientVehicle | null>(null);
   const [diagnoses, setDiagnoses] = useState<VehicleDiagnosis[]>([]);
-  const [maintenanceStatus, setMaintenanceStatus] = useState<MaintenanceStatus>(
-    MaintenanceStatus.PENDING
-  );
-  const [totalCost, setTotalCost] = useState(0); // Nuevo estado para el costo
+  const [maintenanceStatus, setMaintenanceStatus] = useState<MaintenanceStatus>(MaintenanceStatus.PENDING);
+  const [totalCost, setTotalCost] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
+
+  const handleOpenSurveyModal = () => setIsSurveyModalOpen(true);
+  const handleCloseSurveyModal = () => setIsSurveyModalOpen(false);
+
+  const handleSubmitSurvey = async (rating: number | null, feedback: string) => {
+    if (!rating || !vehicle) {
+      alert("Por favor, selecciona una calificación y asegúrate de que los datos del vehículo estén cargados.");
+      return;
+    }
+    try {
+      await createSurvey({
+        rating,
+        feedback,
+        clientId: vehicle.clientId,
+      });
+
+      alert("¡Gracias por tu retroalimentación!");
+      handleCloseSurveyModal();
+    } catch (error) {
+      console.error("Error al enviar la encuesta:", error);
+      alert("Hubo un problema al enviar la encuesta. Intenta nuevamente.");
+    }
+  };
 
   const _initializeData = async () => {
     if (!idVehicle) {
@@ -40,7 +65,6 @@ const VehicleDetailsScreen: React.FC = () => {
       setDiagnoses(fetchedVehicle.diagnosisManager.diagnoses);
       setMaintenanceStatus(fetchedVehicle.maintenanceManager.maintenanceStatus);
 
-      // Calcular el costo inicial
       await _calculateCost(
         fetchedVehicle.diagnosisManager.idDiagnosisManager,
         fetchedVehicle.maintenanceManager.maintenanceStatus
@@ -87,6 +111,7 @@ const VehicleDetailsScreen: React.FC = () => {
           {
             ...diagnosis,
             partsList: diagnosis.partsList.map((part) => ({
+              ...part,
               partDetail: part.partDetail,
               partCost: part.partCost,
               estimatedArrivalDate: part.estimatedArrivalDate,
@@ -131,9 +156,29 @@ const VehicleDetailsScreen: React.FC = () => {
     </Box>
   );
 
+  const handleRequestReport = async () => {
+    if (!idVehicle) {
+      alert("El ID del vehículo no está disponible.");
+      return;
+    }
+    try {
+      const pdfBlob = await generateReport(idVehicle, "FULL_REPORT" as ReportType);
+
+      const url = window.URL.createObjectURL(pdfBlob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "maintenance_report.pdf");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error("Error al generar el reporte:", error);
+      alert("No se pudo generar el reporte. Intenta nuevamente.");
+    }
+  };
+
   const _renderError = () => <Alert severity="error">{error}</Alert>;
 
-  // Render del contenido principal
   const _renderContent = () => (
     <PageItemPaper>
       <Box
@@ -194,9 +239,14 @@ const VehicleDetailsScreen: React.FC = () => {
           </Typography>
           <SummarySection
             totalToPay={totalCost}
-            onRequestReport={() => console.log("Reporte solicitado")}
-            onSubmitSurvey={() => console.log("Encuesta iniciada")}
+            onRequestReport={handleRequestReport}
+            onSubmitSurvey={handleOpenSurveyModal}
             onCustomerSupport={() => console.log("Soporte al cliente")}
+          />
+          <SurveyModal
+            open={isSurveyModalOpen}
+            onClose={handleCloseSurveyModal}
+            onSubmit={handleSubmitSurvey}
           />
         </Box>
       </Box>
