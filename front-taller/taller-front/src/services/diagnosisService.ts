@@ -7,18 +7,43 @@ export interface VehicleDiagnosisDTO {
   problemDetail: string;
   maintenanceCost: number;
   authorized: boolean;
-  evaluationDate: String;
-  partsList: PartDiagnosisDTO[]
+  evaluationDate: string;
+  partsList: PartDiagnosisDTO[];
 }
 
 export interface PartDiagnosisDTO {
+  idPart: number;
   partDetail: string;
   partCost: number;
   estimatedArrivalDate: string;
   shippingStatus: ShippingStatus;
 }
 
-export const getAllDiagnoses = async (
+export const addDiagnosis = async (
+  diagnosisManagerId: number,
+  diagnosis: VehicleDiagnosisDTO
+): Promise<void> => {
+  try {
+    await api.post(`/diagnosis/${diagnosisManagerId}`, diagnosis);
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Error al agregar el diagnóstico."
+    );
+  }
+};
+
+export const getAllDiagnoses = async (): Promise<VehicleDiagnosis[]> => {
+  try {
+    const response = await api.get<VehicleDiagnosis[]>("/diagnosis/all-diagnoses");
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Error al obtener todos los diagnósticos"
+    );
+  }
+};
+
+export const getDiagnosesByManagerId = async (
   diagnosisManagerId: number
 ): Promise<VehicleDiagnosis[]> => {
   try {
@@ -92,6 +117,21 @@ export const calculateAuthorizedCost = async (
   } catch (error: any) {
     throw new Error(
       error.response?.data?.message || "Error al calcular el costo autorizado"
+    );
+  }
+};
+
+export const deleteDiagnosisById = async (
+  diagnosisManagerId: number,
+  diagnosisId: number
+): Promise<void> => {
+  try {
+    await api.delete(
+      `/diagnosis/diagnosisManager/${diagnosisManagerId}/diagnosis/${diagnosisId}`
+    );
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Error al eliminar el diagnóstico"
     );
   }
 };

@@ -11,7 +11,7 @@ public interface DiagnosisManagerServiceInterface {
 
   VehicleDiagnosisDTO getDiagnosisById(Long diagnosisManagerId, Long diagnosisId);
 
-  List<VehicleDiagnosisDTO> getAllDiagnoses(Long diagnosisManagerId);
+  List<VehicleDiagnosisDTO> getAllVehicleDiagnoses(Long diagnosisManagerId);
 
   List<VehicleDiagnosisDTO> getAuthorizedDiagnoses(Long diagnosisManagerId);
 
@@ -20,5 +20,7 @@ public interface DiagnosisManagerServiceInterface {
   float calculateAuthorizedDiagnosisCost(Long diagnosisManagerId);
 
   boolean updateDiagnosis(Long diagnosisManagerId, Long diagnosisId, VehicleDiagnosisDTO updatedDiagnosisDto);
+
+  List<VehicleDiagnosisDTO> getAllDiagnoses();
 
 }

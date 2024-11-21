@@ -32,13 +32,13 @@ const LoginPage: React.FC = () => {
     const userType = userTypeResponse.type;
 
     switch (userType) {
-      case "Admin":
+      case "admin":
         navigate("/homeadmin");
         break;
-      case "Client":
+      case "client":
         navigate("/userHome");
         break;
-      case "Worker":
+      case "worker":
         navigate("/workerHome");
         break;
       default:

@@ -3,6 +3,9 @@ package com.taller.sistema_taller.controller;
 import com.taller.sistema_taller.dto.MaintenanceAdvanceDTO;
 import com.taller.sistema_taller.dto.MaintenanceManagerDTO;
 import com.taller.sistema_taller.service.maintenance_service.MaintenanceManagerService;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,5 +68,11 @@ public class MaintenanceManagerController {
             @RequestParam String status) {
         maintenanceManagerService.updateMaintenanceStatus(managerId, status);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/all-advances")
+    public ResponseEntity<List<MaintenanceAdvanceDTO>> getAllMaintenanceAdvances() {
+        List<MaintenanceAdvanceDTO> advances = maintenanceManagerService.getAllMaintenanceAdvances();
+        return ResponseEntity.ok(advances);
     }
 }

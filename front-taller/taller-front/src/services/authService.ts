@@ -13,8 +13,8 @@ export interface RegisterDTO {
     password: string,
 }
 
-export interface UserTypeResponse {
-  type: "Admin" | "Client" | "Worker";
+export interface UserType {
+  type: "admin" | "client" | "worker";
 }
 
 
@@ -27,7 +27,7 @@ export const login = async (loginData: LoginDTO): Promise<UserAccount> => {
   }
 };
 
-export const registerUser = async (registrationData: RegisterDTO): Promise<void> => {
+export const registerClientAccount = async (registrationData: RegisterDTO): Promise<void> => {
   try {
     await api.post("/users/register?userType=client", registrationData);
   } catch (error: any) {
@@ -35,12 +35,25 @@ export const registerUser = async (registrationData: RegisterDTO): Promise<void>
   }
 };
 
-export const getUserType = async (userId: number): Promise<UserTypeResponse> => {
+export const registerUserAccount = async (
+  registrationData: RegisterDTO,
+  userType: UserType["type"]
+): Promise<void> => {
+  try {
+    const endpoint = `/users/register?userType=${encodeURIComponent(userType)}`;
+    await api.post(endpoint, registrationData);
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Error en el registro");
+  }
+};
+
+
+export const getUserType = async (userId: number): Promise<UserType> => {
   try {
     const response = await api.get<string>(`users/${userId}/type`);
     const userType = response.data.trim();
-    if (userType === "Admin" || userType === "Client" || userType === "Worker") {
-      return { type: userType } as UserTypeResponse;
+    if (userType === "admin" || userType === "client" || userType === "worker") {
+      return { type: userType } as UserType;
     } else {
       throw new Error("Tipo de usuario no reconocido");
     }

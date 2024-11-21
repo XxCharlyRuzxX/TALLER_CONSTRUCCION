@@ -110,11 +110,11 @@ public class UserService implements UserServiceInterface {
 
     private String determineUserType(UserAccount userAccount) {
         if (userAccount instanceof AdminAccount) {
-            return "Admin";
+            return "admin";
         } else if (userAccount instanceof ClientAccount) {
-            return "Client";
+            return "client";
         } else if (userAccount instanceof WorkerAccount) {
-            return "Worker";
+            return "worker";
         } else {
             throw new IllegalStateException("Tipo de usuario no reconocido para el ID");
         }

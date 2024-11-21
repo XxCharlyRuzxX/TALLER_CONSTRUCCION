@@ -26,11 +26,11 @@ const sections = [
   },
   {
     title: "Diagnósticos y Mantenimiento",
-    action: "Consultar",
+    action: "Gestionar",
     icon: (
       <BuildCircleIcon sx={{ fontSize: "8rem", color: Colors.HighlightRed }} />
     ),
-    route: "/admin/diagnostics",
+    route: "/homeadmin/diagnosis&maintenance",
   },
   {
     title: "Generación de Facturas",
