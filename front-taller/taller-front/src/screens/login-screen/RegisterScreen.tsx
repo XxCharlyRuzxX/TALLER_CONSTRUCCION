@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, TextField, Typography, Box, Link } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { registerUser } from "../../services/authService";
+import { registerClientAccount } from "../../services/authService";
 import { RegisterDTO } from "../../services/authService";
 
 const RegisterPage: React.FC = () => {
@@ -31,7 +31,7 @@ const RegisterPage: React.FC = () => {
         password,
       };
 
-      await registerUser(registrationData);
+      await registerClientAccount(registrationData);
       setSuccessMessage("Registro exitoso. Redirigiendo al inicio de sesión...");
       setTimeout(() => navigate("/login"), 2000);
     } catch (err: any) {

@@ -1,5 +1,7 @@
 package com.taller.sistema_taller.service.user_service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.taller.sistema_taller.dto.LoginDTO;
@@ -59,6 +61,7 @@ public class UserService implements UserServiceInterface {
     @Transactional
     public UserAccount updateUser(Long id, UserDTO userDto) {
         userValidator.validateUserExists(id);
+        userValidator.validateUserData(userDto);
 
         return userAccountRepository.findById(id).map(existingUser -> {
             existingUser.setUserName(userDto.getUserName());
@@ -98,13 +101,20 @@ public class UserService implements UserServiceInterface {
 
         return determineUserType(userAccount);
     }
+
+    @Override
+    @Transactional
+    public List<UserAccount> findAllUsers() {
+        return userAccountRepository.findAll();
+    }
+
     private String determineUserType(UserAccount userAccount) {
         if (userAccount instanceof AdminAccount) {
-            return "Admin";
+            return "admin";
         } else if (userAccount instanceof ClientAccount) {
-            return "Client";
+            return "client";
         } else if (userAccount instanceof WorkerAccount) {
-            return "Worker";
+            return "worker";
         } else {
             throw new IllegalStateException("Tipo de usuario no reconocido para el ID");
         }

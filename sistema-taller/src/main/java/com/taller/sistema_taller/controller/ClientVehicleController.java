@@ -29,7 +29,8 @@ public class ClientVehicleController {
     }
 
     @PutMapping("/{vehicleId}")
-    public ResponseEntity<ClientVehicle> updateVehicle(@PathVariable String vehicleId, @Valid @RequestBody ClientVehicleDTO vehicleDto) {
+    public ResponseEntity<ClientVehicle> updateVehicle(@PathVariable String vehicleId,
+            @Valid @RequestBody ClientVehicleDTO vehicleDto) {
         ClientVehicle updatedVehicle = clientVehicleService.updateVehicle(vehicleId, vehicleDto);
         return new ResponseEntity<>(updatedVehicle, HttpStatus.OK);
     }
@@ -51,4 +52,11 @@ public class ClientVehicleController {
         List<ClientVehicle> vehicles = clientVehicleService.findAllVehiclesByClient(clientId);
         return ResponseEntity.ok(vehicles);
     }
+
+    @GetMapping
+    public ResponseEntity<List<ClientVehicle>> findAllVehicles() {
+        List<ClientVehicle> vehicles = clientVehicleService.findAllVehicles();
+        return ResponseEntity.ok(vehicles);
+    }
+
 }

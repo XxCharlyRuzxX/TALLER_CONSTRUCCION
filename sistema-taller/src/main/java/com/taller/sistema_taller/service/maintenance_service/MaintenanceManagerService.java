@@ -12,6 +12,8 @@ import com.taller.sistema_taller.service.maintenance_service.maintenance_validat
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,7 +38,7 @@ public class MaintenanceManagerService implements MaintenanceManagerServiceInter
         maintenanceValidator.validateAdvance(advanceDTO);
 
         MaintenanceAdvance advance = new MaintenanceAdvance(advanceDTO.getDate(), advanceDTO.getDescription());
-        //advanceDTO.getImagesAdvance().forEach(advance::addImage);
+        // advanceDTO.getImagesAdvance().forEach(advance::addImage);
 
         manager.getMaintenanceProgresses().add(advance);
         maintenanceManagerRepository.save(manager);
@@ -112,6 +114,15 @@ public class MaintenanceManagerService implements MaintenanceManagerServiceInter
         return convertAdvanceToDTO(advance);
     }
 
+    @Override
+    public List<MaintenanceAdvanceDTO> getAllMaintenanceAdvances() {
+        List<MaintenanceManager> managers = maintenanceManagerRepository.findAll();
+        return managers.stream()
+                .flatMap(manager -> manager.getMaintenanceProgresses().stream())
+                .map(this::convertAdvanceToDTO)
+                .collect(Collectors.toList());
+    }
+
     private MaintenanceManagerDTO convertToDTO(MaintenanceManager manager) {
         MaintenanceManagerDTO dto = new MaintenanceManagerDTO();
         dto.setIdMaintenanceManager(manager.getIdMaintenanceManager());
@@ -128,7 +139,7 @@ public class MaintenanceManagerService implements MaintenanceManagerServiceInter
         dto.setIdMaintenanceAdvance(advance.getIdMaintenanceAdvance());
         dto.setDate(advance.getDate());
         dto.setDescription(advance.getDescription());
-        //dto.setImagesAdvance(advance.getImagesAdvance());
+        // dto.setImagesAdvance(advance.getImagesAdvance());
         return dto;
     }
 }

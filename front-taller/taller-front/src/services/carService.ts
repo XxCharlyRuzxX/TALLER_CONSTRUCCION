@@ -40,3 +40,18 @@ export const getVehicleByVehicleId = async (vehicleId: string): Promise<ClientVe
     );
   }
 };
+
+export const getAllVehicles = async (): Promise<ClientVehicle[]> => {
+  const response = await api.get<ClientVehicle[]>("/vehicles");
+  return response.data;
+};
+
+export const updateVehicle = async (vehicleId: string, vehicleDto: ClientVehicleDTO): Promise<ClientVehicle> => {
+  const response = await api.put<ClientVehicle>(`/vehicles/${vehicleId}`, vehicleDto);
+  return response.data;
+};
+
+export const deleteVehicle = async (vehicleId: string): Promise<void> => {
+  await api.delete(`/vehicles/${vehicleId}`);
+};
+

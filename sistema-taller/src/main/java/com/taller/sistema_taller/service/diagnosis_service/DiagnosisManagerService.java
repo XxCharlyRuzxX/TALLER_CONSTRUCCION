@@ -60,7 +60,7 @@ public class DiagnosisManagerService implements DiagnosisManagerServiceInterface
   }
 
   @Override
-  public List<VehicleDiagnosisDTO> getAllDiagnoses(Long diagnosisManagerId) {
+  public List<VehicleDiagnosisDTO> getAllVehicleDiagnoses(Long diagnosisManagerId) {
     DiagnosisManager diagnosisManager = getDiagnosisManagerById(diagnosisManagerId);
     return diagnosisManager.getDiagnoses().stream()
         .map(this::convertToVehicleDiagnosisDTO)
@@ -113,6 +113,15 @@ public class DiagnosisManagerService implements DiagnosisManagerServiceInterface
     } else {
       return false;
     }
+  }
+
+  @Override
+  public List<VehicleDiagnosisDTO> getAllDiagnoses() {
+    List<DiagnosisManager> allManagers = diagnosisManagerRepository.findAll();
+    return allManagers.stream()
+        .flatMap(manager -> manager.getDiagnoses().stream())
+        .map(this::convertToVehicleDiagnosisDTO)
+        .collect(Collectors.toList());
   }
 
   private DiagnosisManager getDiagnosisManagerById(Long id) {

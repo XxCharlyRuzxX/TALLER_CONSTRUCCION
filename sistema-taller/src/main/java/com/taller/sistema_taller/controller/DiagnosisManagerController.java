@@ -39,9 +39,9 @@ public class DiagnosisManagerController {
     }
 
     @GetMapping("/diagnosisManager/{diagnosisManagerId}")
-    public ResponseEntity<List<VehicleDiagnosisDTO>> getAllDiagnoses(
+    public ResponseEntity<List<VehicleDiagnosisDTO>> getAllVehicleDiagnoses(
             @PathVariable Long diagnosisManagerId) {
-        return ResponseEntity.ok(diagnosisManagerService.getAllDiagnoses(diagnosisManagerId));
+        return ResponseEntity.ok(diagnosisManagerService.getAllVehicleDiagnoses(diagnosisManagerId));
     }
 
     @GetMapping("/diagnosisManager/{diagnosisManagerId}/authorized")
@@ -78,4 +78,11 @@ public class DiagnosisManagerController {
             @PathVariable Long diagnosisManagerId) {
         return ResponseEntity.ok(diagnosisManagerService.calculateAuthorizedDiagnosisCost(diagnosisManagerId));
     }
+
+    @GetMapping("/all-diagnoses")
+    public ResponseEntity<List<VehicleDiagnosisDTO>> getAllDiagnoses() {
+        List<VehicleDiagnosisDTO> allDiagnoses = diagnosisManagerService.getAllDiagnoses();
+        return ResponseEntity.ok(allDiagnoses);
+    }
+
 }

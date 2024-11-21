@@ -1,5 +1,7 @@
 package com.taller.sistema_taller.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,6 +57,12 @@ public class UserController {
     public ResponseEntity<String> getUserType(@PathVariable Long id) {
         String userType = userService.findUserTypeById(id);
         return ResponseEntity.ok(userType);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserAccount>> getAllUsers() {
+        List<UserAccount> users = userService.findAllUsers();
+        return ResponseEntity.ok(users);
     }
 
 }
