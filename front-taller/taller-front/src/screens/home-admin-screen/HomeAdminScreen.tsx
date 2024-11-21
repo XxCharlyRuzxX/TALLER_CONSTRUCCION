@@ -1,68 +1,18 @@
 import React from "react";
 import { Box, Typography, Button, Grid, Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import PeopleIcon from "@mui/icons-material/People";
-import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
-import BuildCircleIcon from "@mui/icons-material/BuildCircle";
-import ReceiptIcon from "@mui/icons-material/Receipt";
-import PaymentIcon from "@mui/icons-material/Payment";
-import BarChartIcon from "@mui/icons-material/BarChart";
-import Colors from "../../utils/Colors";
-
-const sections = [
-  {
-    title: "Gestión de Usuarios",
-    action: "Gestionar",
-    icon: <PeopleIcon sx={{ fontSize: "8rem", color: Colors.HighlightBlue }} />,
-    route: "/homeadmin/users",
-  },
-  {
-    title: "Gestión de Vehículos",
-    action: "Gestionar",
-    icon: (
-      <DirectionsCarIcon sx={{ fontSize: "8rem", color: Colors.DarkBlue }} />
-    ),
-    route: "/homeadmin/vehicles",
-  },
-  {
-    title: "Diagnósticos y Mantenimiento",
-    action: "Gestionar",
-    icon: (
-      <BuildCircleIcon sx={{ fontSize: "8rem", color: Colors.HighlightRed }} />
-    ),
-    route: "/homeadmin/diagnosis&maintenance",
-  },
-  {
-    title: "Generación de Facturas",
-    action: "Gestionar",
-    icon: (
-      <ReceiptIcon sx={{ fontSize: "8rem", color: Colors.HighlightGray }} />
-    ),
-    route: "/admin/invoices",
-  },
-  {
-    title: "Gestión de Pagos",
-    action: "Gestionar",
-    icon: (
-      <PaymentIcon sx={{ fontSize: "8rem", color: Colors.HighlightOrange }} />
-    ),
-    route: "/admin/payments",
-  },
-  {
-    title: "Generación de Reportes",
-    action: "Consultar",
-    icon: (
-      <BarChartIcon sx={{ fontSize: "8rem", color: Colors.HighlightGreen }} />
-    ),
-    route: "/admin/reports",
-  },
-];
+import { sections } from "./components/AdminSections";
 
 const HomeAdminScreen: React.FC = () => {
   const navigate = useNavigate();
 
   const handleSectionClick = (route: string) => {
-    navigate(route); // Redirige al usuario a la ruta proporcionada
+    if (route != "") {
+      navigate(route);
+    }
+    else{
+      alert("Esta seccion no está disponible");
+    }
   };
 
   return (
