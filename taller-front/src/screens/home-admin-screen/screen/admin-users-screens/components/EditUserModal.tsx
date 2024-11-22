@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Paper, Box, Typography, TextField, Button } from "@mui/material";
-import { getUserById, updateUser } from "../../../../services/userService";
-import { UserAccount } from "../../../../interfaces/UserAccount";
+import { getUserById, updateUser } from "../../../../../services/userService";
+import { UserAccount } from "../../../../../interfaces/UserAccount";
 
 interface EditUserModalProps {
   open: boolean;

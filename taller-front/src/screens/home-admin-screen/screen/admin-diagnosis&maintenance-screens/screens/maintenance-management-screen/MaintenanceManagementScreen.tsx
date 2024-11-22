@@ -14,9 +14,9 @@ import {
 } from "@mui/material";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import { ClientVehicle } from "../../../../../../interfaces/ClientVehicle";
-import { getAllVehicles } from "../../../../../../services/carService";
 import SearchBar from "../../../../../../components/SearchBar";
 import Colors from "../../../../../../utils/Colors";
+import { getAllVehicles } from "../../../../../../services/vehicleService";
 
 const MaintenanceManagementScreen: React.FC = () => {
   const [vehicles, setVehicles] = useState<ClientVehicle[]>([]);

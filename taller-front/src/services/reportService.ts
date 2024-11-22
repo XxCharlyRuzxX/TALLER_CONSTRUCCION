@@ -1,11 +1,15 @@
 import api from "./api/apiConfig";
-
-export type ReportType = "FULL_REPORT" | "VEHICLE_DATA_REPORT" | "DIAGNOSES_REPORT" | "MAINTENANCE_REPORT";
+import { API_ROUTES } from "./api/apiRoutes";
+import { ReportType } from "./interfaces/ReportInterfaces";
 
 export const generateReport = async (vehicleId: string, reportType: ReportType): Promise<Blob> => {
-  const response = await api.get<Blob>("/reports/generate", {
-    params: { vehicleId, reportType },
-    responseType: "blob",
-  });
-  return response.data;
+  try {
+    const response = await api.get<Blob>(API_ROUTES.REPORTS.GENERATE, {
+      params: { vehicleId, reportType },
+      responseType: "blob",
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Error al generar el reporte.");
+  }
 };

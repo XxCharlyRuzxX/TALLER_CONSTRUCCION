@@ -6,7 +6,7 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import { VehicleDiagnosisDTO } from "../../../../services/diagnosisService";
+import { VehicleDiagnosisDTO } from "../../../../services/interfaces/DiagnosisInterfaces";
 
 interface DiagnosisModalProps {
   open: boolean;

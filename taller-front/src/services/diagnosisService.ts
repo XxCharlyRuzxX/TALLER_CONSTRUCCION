@@ -1,23 +1,8 @@
-import { ShippingStatus } from "../interfaces/PartDiagnosis";
 import { VehicleDiagnosis } from "../interfaces/VehicleDiagnosis";
 import api from "./api/apiConfig";
-
-export interface VehicleDiagnosisDTO {
-  idDiagnosis: number;
-  problemDetail: string;
-  maintenanceCost: number;
-  authorized: boolean;
-  evaluationDate: string;
-  partsList: PartDiagnosisDTO[];
-}
-
-export interface PartDiagnosisDTO {
-  idPart: number;
-  partDetail: string;
-  partCost: number;
-  estimatedArrivalDate: string;
-  shippingStatus: ShippingStatus;
-}
+import { API_ROUTES } from "./api/apiRoutes";
+import { handleError } from "./api/errorHandler";
+import { VehicleDiagnosisDTO } from "./interfaces/DiagnosisInterfaces";
 
 export const addDiagnosis = async (
   diagnosisManagerId: number,
@@ -26,20 +11,20 @@ export const addDiagnosis = async (
   try {
     await api.post(`/diagnosis/${diagnosisManagerId}`, diagnosis);
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message || "Error al agregar el diagnóstico."
-    );
+    handleError(error);
+    throw error;
   }
 };
 
 export const getAllDiagnoses = async (): Promise<VehicleDiagnosis[]> => {
   try {
-    const response = await api.get<VehicleDiagnosis[]>("/diagnosis/all-diagnoses");
+    const response = await api.get<VehicleDiagnosis[]>(
+      API_ROUTES.DIAGNOSIS.GET_ALL
+    );
     return response.data;
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message || "Error al obtener todos los diagnósticos"
-    );
+    handleError(error);
+    throw error;
   }
 };
 
@@ -48,13 +33,12 @@ export const getDiagnosesByManagerId = async (
 ): Promise<VehicleDiagnosis[]> => {
   try {
     const response = await api.get<VehicleDiagnosis[]>(
-      `/diagnosis/diagnosisManager/${diagnosisManagerId}`
+      API_ROUTES.DIAGNOSIS.BY_MANAGER_ID(diagnosisManagerId)
     );
     return response.data;
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message || "Error al obtener los diagnósticos"
-    );
+    handleError(error);
+    throw error;
   }
 };
 
@@ -63,14 +47,12 @@ export const getAuthorizedDiagnoses = async (
 ): Promise<VehicleDiagnosis[]> => {
   try {
     const response = await api.get<VehicleDiagnosis[]>(
-      `/diagnosis/diagnosisManager/${diagnosisManagerId}/authorized`
+      API_ROUTES.DIAGNOSIS.AUTHORIZED(diagnosisManagerId)
     );
     return response.data;
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message ||
-        "Error al obtener los diagnósticos autorizados"
-    );
+    handleError(error);
+    throw error;
   }
 };
 
@@ -81,13 +63,12 @@ export const updateDiagnosis = async (
 ): Promise<void> => {
   try {
     await api.put(
-      `/diagnosis/diagnosisManager/${diagnosisManagerId}/diagnosis/${diagnosisId}`,
+      API_ROUTES.DIAGNOSIS.UPDATE(diagnosisManagerId, diagnosisId),
       updatedDiagnosis
     );
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message || "Error al actualizar el diagnóstico"
-    );
+    handleError(error);
+    throw error;
   }
 };
 
@@ -96,13 +77,12 @@ export const calculateTotalCost = async (
 ): Promise<number> => {
   try {
     const response = await api.get<number>(
-      `/diagnosis/diagnosisManager/${diagnosisManagerId}/total-cost`
+      API_ROUTES.DIAGNOSIS.CALCULATE_TOTAL_COST(diagnosisManagerId)
     );
     return response.data;
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message || "Error al calcular el costo total"
-    );
+    handleError(error);
+    throw error;
   }
 };
 
@@ -111,13 +91,12 @@ export const calculateAuthorizedCost = async (
 ): Promise<number> => {
   try {
     const response = await api.get<number>(
-      `/diagnosis/diagnosisManager/${diagnosisManagerId}/authorized-cost`
+      API_ROUTES.DIAGNOSIS.CALCULATE_AUTHORIZED_COST(diagnosisManagerId)
     );
     return response.data;
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message || "Error al calcular el costo autorizado"
-    );
+    handleError(error);
+    throw error;
   }
 };
 
@@ -127,11 +106,10 @@ export const deleteDiagnosisById = async (
 ): Promise<void> => {
   try {
     await api.delete(
-      `/diagnosis/diagnosisManager/${diagnosisManagerId}/diagnosis/${diagnosisId}`
+      API_ROUTES.DIAGNOSIS.DELETE(diagnosisManagerId, diagnosisId)
     );
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message || "Error al eliminar el diagnóstico"
-    );
+    handleError(error);
+    throw error;
   }
 };
