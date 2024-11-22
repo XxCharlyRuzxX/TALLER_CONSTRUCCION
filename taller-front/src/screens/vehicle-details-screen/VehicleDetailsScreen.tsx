@@ -6,16 +6,18 @@ import SummarySection from "./components/SummarySection";
 import GeneralVehicleData from "./components/GeneralVehicleData";
 import DiagnosisVehicleSection from "./components/DiagnosisVehicleSection";
 import MaintenanceVehicleSection from "./components/MaintenanceVehicleSection";
-import { ClientVehicle } from "../../interfaces/ClientVehicle";
-import { calculateAuthorizedCost, calculateTotalCost, updateDiagnosis } from "../../services/diagnosisService";
-import { getVehicleByVehicleId } from "../../services/carService";
 import { PageItemPaper } from "../../components/PageItemPaper";
 import { VehicleDiagnosis } from "../../interfaces/VehicleDiagnosis";
 import { updateMaintenanceStatus } from "../../services/maintenanceService";
 import { MaintenanceStatus } from "../../interfaces/MaintenanceManager";
-import { ReportType, generateReport } from "../../services/reportService";
 import SurveyModal from "./components/SurveyModal";
 import { createSurvey } from "../../services/surveyService";
+import { downloadFile } from "../../utils/downloadFile";
+import { getVehicleByVehicleId } from "../../services/vehicleService";
+import { calculateAuthorizedCost, calculateTotalCost, updateDiagnosis } from "../../services/diagnosisService";
+import { generateReport } from "../../services/reportService";
+import { ReportType } from "../../services/interfaces/ReportInterfaces";
+import { ClientVehicle } from "../../interfaces/ClientVehicle";
 
 const VehicleDetailsScreen: React.FC = () => {
   const { idVehicle } = useParams<{ idVehicle: string }>();
@@ -143,19 +145,6 @@ const VehicleDetailsScreen: React.FC = () => {
     }
   };
 
-  const _renderLoading = () => (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <CircularProgress />
-    </Box>
-  );
-
   const handleRequestReport = async () => {
     if (!idVehicle) {
       alert("El ID del vehículo no está disponible.");
@@ -163,23 +152,37 @@ const VehicleDetailsScreen: React.FC = () => {
     }
     try {
       const pdfBlob = await generateReport(idVehicle, "FULL_REPORT" as ReportType);
-
-      const url = window.URL.createObjectURL(pdfBlob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "maintenance_report.pdf");
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      downloadFile(pdfBlob, `Reporte_Vehiculo_${idVehicle}.pdf`);
     } catch (error) {
       console.error("Error al generar el reporte:", error);
       alert("No se pudo generar el reporte. Intenta nuevamente.");
     }
   };
 
-  const _renderError = () => <Alert severity="error">{error}</Alert>;
+  useEffect(() => {
+    _initializeData();
+  }, [idVehicle]);
 
-  const _renderContent = () => (
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return <Alert severity="error">{error}</Alert>;
+  }
+
+  return (
     <PageItemPaper>
       <Box
         sx={{
@@ -252,14 +255,6 @@ const VehicleDetailsScreen: React.FC = () => {
       </Box>
     </PageItemPaper>
   );
-
-  useEffect(() => {
-    _initializeData();
-  }, [idVehicle]);
-
-  if (loading) return _renderLoading();
-  if (error) return _renderError();
-  return _renderContent();
 };
 
 export default VehicleDetailsScreen;

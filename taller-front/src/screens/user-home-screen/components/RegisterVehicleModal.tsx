@@ -1,15 +1,9 @@
 import React, { useState } from "react";
-import {
-  Modal,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Alert,
-} from "@mui/material";
+import { Modal, Box, Typography, TextField, Button, Alert } from "@mui/material";
 import Colors from "../../../utils/Colors";
-import { ClientVehicleDTO, registerVehicle } from "../../../services/carService";
 import { UserAccount } from "../../../interfaces/UserAccount";
+import { registerNewVehicle } from "../functions/vehicleFunctions";
+import { ClientVehicleDTO } from "../../../services/interfaces/VehicleInterfaces";
 
 interface RegisterVehicleModalProps {
   userAccount: UserAccount;
@@ -18,12 +12,7 @@ interface RegisterVehicleModalProps {
   onSave: () => void;
 }
 
-const RegisterVehicleModal: React.FC<RegisterVehicleModalProps> = ({
-  userAccount,
-  open,
-  onClose,
-  onSave,
-}) => {
+const RegisterVehicleModal: React.FC<RegisterVehicleModalProps> = ({ userAccount, open, onClose, onSave }) => {
   const initialVehicleData: ClientVehicleDTO = {
     clientId: userAccount.userId,
     brand: "",
@@ -50,7 +39,7 @@ const RegisterVehicleModal: React.FC<RegisterVehicleModalProps> = ({
   const handleSave = async () => {
     try {
       setError(null);
-      await registerVehicle(vehicleData);
+      await registerNewVehicle(vehicleData);
       setVehicleData(initialVehicleData);
       onSave();
       onClose();
@@ -61,99 +50,22 @@ const RegisterVehicleModal: React.FC<RegisterVehicleModalProps> = ({
 
   return (
     <Modal open={open} onClose={onClose}>
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: 600,
-          bgcolor: "background.paper",
-          borderRadius: 2,
-          boxShadow: 24,
-          p: 3,
-          overflowY: "auto",
-        }}
-      >
-        <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
-          Registrar Nuevo Vehículo
-        </Typography>
+      <Box sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 600, bgcolor: "background.paper", borderRadius: 2, boxShadow: 24, p: 3, overflowY: "auto" }}>
+        <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>Registrar Nuevo Vehículo</Typography>
 
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-        <TextField
-          label="Marca"
-          name="brand"
-          value={vehicleData.brand}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          label="Modelo"
-          name="model"
-          value={vehicleData.model}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          label="Año"
-          name="year"
-          value={vehicleData.year || ""}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-          type="number"
-        />
-        <TextField
-          label="Placa"
-          name="licensePlate"
-          value={vehicleData.licensePlate}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          label="Kilometraje"
-          name="mileage"
-          value={vehicleData.mileage || ""}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-          type="number"
-        />
-        <TextField
-          label="Nivel de Combustible (%)"
-          name="fuelLevel"
-          value={vehicleData.fuelLevel || ""}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-          type="number"
-        />
-        <TextField
-          label="Observaciones Adicionales"
-          name="additionalObservations"
-          value={vehicleData.additionalObservations}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-          multiline
-          rows={3}
-        />
+        <TextField label="Marca" name="brand" value={vehicleData.brand} onChange={handleChange} fullWidth margin="normal" />
+        <TextField label="Modelo" name="model" value={vehicleData.model} onChange={handleChange} fullWidth margin="normal" />
+        <TextField label="Año" name="year" value={vehicleData.year || ""} onChange={handleChange} fullWidth margin="normal" type="number" />
+        <TextField label="Placa" name="licensePlate" value={vehicleData.licensePlate} onChange={handleChange} fullWidth margin="normal" />
+        <TextField label="Kilometraje" name="mileage" value={vehicleData.mileage || ""} onChange={handleChange} fullWidth margin="normal" type="number" />
+        <TextField label="Nivel de Combustible (%)" name="fuelLevel" value={vehicleData.fuelLevel || ""} onChange={handleChange} fullWidth margin="normal" type="number" />
+        <TextField label="Observaciones Adicionales" name="additionalObservations" value={vehicleData.additionalObservations} onChange={handleChange} fullWidth margin="normal" multiline rows={3} />
 
         <Box sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}>
-          <Button variant="contained" onClick={onClose} sx={{ bgcolor: Colors.HighlightRed }}>
-            Cancelar
-          </Button>
-          <Button
-            variant="contained"
-            sx={{ bgcolor: Colors.HighlightGreen }}
-            onClick={handleSave}
-          >
-            Guardar
-          </Button>
+          <Button variant="contained" onClick={onClose} sx={{ bgcolor: Colors.HighlightRed }}>Cancelar</Button>
+          <Button variant="contained" sx={{ bgcolor: Colors.HighlightGreen }} onClick={handleSave}>Guardar</Button>
         </Box>
       </Box>
     </Modal>

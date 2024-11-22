@@ -106,7 +106,6 @@ const DiagnosisVehicleSection: React.FC<DiagnosisVehicleSectionProps> = ({
         boxShadow: "none",
       }}
     >
-      {/* Estado del mantenimiento con ícono */}
       <Box
         sx={{
           display: "flex",
@@ -123,7 +122,7 @@ const DiagnosisVehicleSection: React.FC<DiagnosisVehicleSectionProps> = ({
             fontSize: 22,
           }}
         >
-          {label} {/* Texto dinámico según el estado */}
+          {label}
         </Typography>
       </Box>
 

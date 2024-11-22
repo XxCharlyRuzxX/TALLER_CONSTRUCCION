@@ -5,9 +5,9 @@ import { PageItemPaper } from "../../components/PageItemPaper";
 import { Colors } from "../../utils/Colors";
 import { UserAccount } from "../../interfaces/UserAccount";
 import { ClientVehicle } from "../../interfaces/ClientVehicle";
-import { getClientVehiclesByCleintId } from "../../services/carService";
 import ExpandableTableCard from "./components/ExpandedTableCar";
 import RegisterVehicleModal from "./components/RegisterVehicleModal";
+import { loadClientVehicles, updateClientVehicles } from "./functions/userHomeFunctions";
 
 const UserHomePage: React.FC = () => {
   const [user, setUser] = useState<UserAccount | null>(null);
@@ -23,14 +23,14 @@ const UserHomePage: React.FC = () => {
     } else {
       const parsedUser: UserAccount = JSON.parse(storedUser);
       setUser(parsedUser);
-      loadClientVehicles(parsedUser.userId);
+      loadVehicles(parsedUser);
     }
   }, [navigate]);
 
-  const loadClientVehicles = async (userId: number) => {
+  const loadVehicles = async (user: UserAccount) => {
     setLoading(true);
     try {
-      const fetchedVehicles = await getClientVehiclesByCleintId(userId);
+      const fetchedVehicles = await loadClientVehicles(user.userId);
       setVehicles(fetchedVehicles);
     } catch (err) {
       console.error("Error al cargar los vehículos:", err);
@@ -45,7 +45,7 @@ const UserHomePage: React.FC = () => {
 
   const handleSaveVehicle = () => {
     if (user) {
-      loadClientVehicles(user.userId);
+      updateClientVehicles(user, setVehicles);
     }
     setIsModalOpen(false);
   };
@@ -53,43 +53,16 @@ const UserHomePage: React.FC = () => {
   if (!user) return null;
 
   if (loading) {
-    // Mostrar el ícono de carga mientras los datos están cargando
     return (
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "100vh",
-          backgroundColor: "#F5F1F1",
-        }}
-      >
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", backgroundColor: "#F5F1F1" }}>
         <CircularProgress />
       </Box>
     );
   }
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        minHeight: "100vh",
-        backgroundColor: "#F5F1F1",
-      }}
-    >
-      <Box
-        sx={{
-          width: "100%",
-          height: 100,
-          backgroundColor: Colors.HighlightGray,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 2,
-        }}
-      >
+    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", minHeight: "100vh", backgroundColor: "#F5F1F1" }}>
+      <Box sx={{ width: "100%", height: 100, backgroundColor: Colors.HighlightGray, display: "flex", alignItems: "center", justifyContent: "center", gap: 2 }}>
         <Typography variant="h5" sx={{ color: Colors.White }}>
           BIENVENIDO A MI TALLER
         </Typography>
@@ -98,28 +71,16 @@ const UserHomePage: React.FC = () => {
 
       <PageItemPaper sx={{ width: "80%", mt: 4, minHeight: "400px" }}>
         <Box display="flex" alignItems="center">
-          <Avatar
-            sx={{
-              width: 56,
-              height: 56,
-              backgroundColor: Colors.HighlightBlue,
-            }}
-          >
+          <Avatar sx={{ width: 56, height: 56, backgroundColor: Colors.HighlightBlue }}>
             {user.userName.charAt(0)}
           </Avatar>
           <Box ml={2}>
             <Typography variant="h6">{user.userName}</Typography>
-            <Typography variant="body2" color="textSecondary">
-              {user.accessCredentials.email}
-            </Typography>
+            <Typography variant="body2" color="textSecondary">{user.accessCredentials.email}</Typography>
           </Box>
         </Box>
         <Box sx={{ paddingTop: 2 }}>
-          <ExpandableTableCard
-            cars={vehicles}
-            title="Mis Vehículos"
-            onAddCar={handleAddCar}
-          />
+          <ExpandableTableCard cars={vehicles} title="Mis Vehículos" onAddCar={handleAddCar} />
         </Box>
       </PageItemPaper>
       <RegisterVehicleModal

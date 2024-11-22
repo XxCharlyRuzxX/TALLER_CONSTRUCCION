@@ -9,10 +9,10 @@ import {
 } from "@mui/material";
 import {
   updateVehicle,
-  ClientVehicleDTO,
   getVehicleByVehicleId,
-} from "../../../../services/carService";
-import { ClientVehicle } from "../../../../interfaces/ClientVehicle";
+} from "../../../../../services/vehicleService";
+import { ClientVehicle } from "../../../../../interfaces/ClientVehicle";
+import { ClientVehicleDTO } from "../../../../../services/interfaces/VehicleInterfaces";
 
 interface EditVehicleModalProps {
   open: boolean;

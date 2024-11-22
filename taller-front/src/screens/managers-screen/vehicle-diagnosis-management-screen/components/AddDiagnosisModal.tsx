@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Modal, Box, Typography, TextField, Button } from "@mui/material";
-import { VehicleDiagnosisDTO } from "../../../../services/diagnosisService";
+import { VehicleDiagnosisDTO } from "../../../../services/interfaces/DiagnosisInterfaces";
 
 interface AddDiagnosisModalProps {
   open: boolean;

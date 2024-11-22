@@ -1,27 +1,16 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  CircularProgress,
-} from "@mui/material";
+import { Box, Typography, Button, CircularProgress } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { MaintenanceStatus } from "../../../interfaces/MaintenanceManager";
-import { getVehicleByVehicleId } from "../../../services/carService";
 import Colors from "../../../utils/Colors";
-import { MaintenanceAdvance } from "../../../interfaces/MaintenanceAdvance";
 import { ClientVehicle } from "../../../interfaces/ClientVehicle";
 import AddAdvanceModal from "./components/AddAdvanceModal";
 import UpdateAdvanceModal from "./components/UpdateAdvanceModal";
 import StatusUpdateModal from "./components/StatusUpdateModal";
 import { deleteMaintenanceAdvance } from "../../../services/maintenanceService";
+import MaintenanceAdvancesTable from "./components/MaintenanceAdvancesTable";
+import { MaintenanceAdvance } from "../../../interfaces/MaintenanceAdvance";
+import { getStatusColor } from "./functions/statusColor";
+import { getVehicleByVehicleId } from "../../../services/vehicleService";
 
 const MaintenanceManagement: React.FC = () => {
   const { idVehicle } = useParams<{ idVehicle: string }>();
@@ -31,18 +20,6 @@ const MaintenanceManagement: React.FC = () => {
   const [editingAdvance, setEditingAdvance] = useState<MaintenanceAdvance | null>(null);
   const [statusModalOpen, setStatusModalOpen] = useState(false);
 
-  const getStatusColor = (status: MaintenanceStatus) => {
-    switch (status) {
-      case MaintenanceStatus.PENDING:
-        return Colors.HighlightRed;
-      case MaintenanceStatus.IN_PROGRESS:
-        return Colors.HighlightOrange;
-      case MaintenanceStatus.COMPLETED:
-        return Colors.HighlightGreen;
-      default:
-        return Colors.Black;
-    }
-  };
 
   const fetchVehicleData = async () => {
     setLoading(true);
@@ -93,56 +70,16 @@ const MaintenanceManagement: React.FC = () => {
               Actualizar Estado
             </Button>
           </Box>
-          <TableContainer component={Paper} sx={{ borderRadius: "12px", overflow: "hidden", mb: 4 }}>
-            <Table>
-              <TableHead sx={{ backgroundColor: Colors.HighlightGray }}>
-                <TableRow>
-                  <TableCell align="center" sx={{ color: Colors.White }}>
-                    <b>ID Avance</b>
-                  </TableCell>
-                  <TableCell align="center" sx={{ color: Colors.White }}>
-                    <b>Fecha</b>
-                  </TableCell>
-                  <TableCell align="center" sx={{ color: Colors.White }}>
-                    <b>Descripción</b>
-                  </TableCell>
-                  <TableCell align="center" sx={{ color: Colors.White }}>
-                    <b>Acciones</b>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {vehicle.maintenanceManager.maintenanceProgresses.map((advance) => (
-                  <TableRow key={advance.idMaintenanceAdvance}>
-                    <TableCell align="center">{advance.idMaintenanceAdvance}</TableCell>
-                    <TableCell align="center">{advance.date}</TableCell>
-                    <TableCell align="center">{advance.description}</TableCell>
-                    <TableCell align="center">
-                      <Button
-                        variant="outlined"
-                        color="secondary"
-                        onClick={() => setEditingAdvance(advance)}
-                        sx={{ ml: 1 }}
-                      >
-                        Editar
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        onClick={() => handleDeleteAdvance(advance.idMaintenanceAdvance)}
-                        sx={{ ml: 1 }}
-                      >
-                        Eliminar
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <MaintenanceAdvancesTable
+            advances={vehicle.maintenanceManager.maintenanceProgresses}
+            onEdit={(advance) => setEditingAdvance(advance)}
+            onDelete={handleDeleteAdvance}
+          />
+
           <Button variant="contained" onClick={() => setIsAdding(true)} sx={{ mb: 4 }}>
             Agregar Avance
           </Button>
+
           {isAdding && (
             <AddAdvanceModal
               open={isAdding}
@@ -160,7 +97,7 @@ const MaintenanceManagement: React.FC = () => {
               onClose={() => setEditingAdvance(null)}
               onUpdate={() => {
                 setEditingAdvance(null);
-                fetchVehicleData()
+                fetchVehicleData();
               }}
               advance={editingAdvance}
               managerId={vehicle.maintenanceManager.idMaintenanceManager}

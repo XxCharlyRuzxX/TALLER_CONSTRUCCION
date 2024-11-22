@@ -1,27 +1,12 @@
-import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
-  Paper,
-  TextField,
-  CircularProgress,
-} from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Box, Typography, Button, TextField, CircularProgress } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { useNavigate } from "react-router-dom";
+import { deleteVehicle, getAllVehicles } from "../../../../services/vehicleService";
 import Colors from "../../../../utils/Colors";
 import { ClientVehicle } from "../../../../interfaces/ClientVehicle";
-import { deleteVehicle, getAllVehicles } from "../../../../services/carService";
-import EditVehicleModal from "./EditVehicleModal";
+import VehiclesTable from "./components/VehiclesTable";
+import EditVehicleModal from "./components/EditVehicleModal";
+import AddVehicleModal from "./components/AddVehicleModal";
 
 const AdminVehiclesScreen: React.FC = () => {
   const [vehicles, setVehicles] = useState<ClientVehicle[]>([]);
@@ -32,8 +17,7 @@ const AdminVehiclesScreen: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
-
-  const navigate = useNavigate();
+  const [openAddModal, setOpenAddModal] = useState(false);
 
   useEffect(() => {
     const fetchVehicles = async () => {
@@ -69,7 +53,7 @@ const AdminVehiclesScreen: React.FC = () => {
   };
 
   const handleAddVehicle = () => {
-    navigate("/add-vehicle");
+    setOpenAddModal(true);
   };
 
   const handleEditVehicle = (vehicleId: string) => {
@@ -96,7 +80,17 @@ const AdminVehiclesScreen: React.FC = () => {
     setSelectedVehicleId(null);
   };
 
+  const handleAddModalClose = () => {
+    setOpenAddModal(false);
+  };
+
   const handleVehicleUpdated = async () => {
+    const updatedVehicles = await getAllVehicles();
+    setVehicles(updatedVehicles);
+    setFilteredVehicles(updatedVehicles);
+  };
+
+  const handleVehicleAdded = async () => {
     const updatedVehicles = await getAllVehicles();
     setVehicles(updatedVehicles);
     setFilteredVehicles(updatedVehicles);
@@ -141,71 +135,16 @@ const AdminVehiclesScreen: React.FC = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <TableContainer component={Paper} sx={{ borderRadius: "12px", overflow: "hidden" }}>
-          <Table>
-            <TableHead sx={{ backgroundColor: Colors.HighlightGray }}>
-              <TableRow>
-                <TableCell align="center" sx={{ color: Colors.White }}>
-                  <b>Placa</b>
-                </TableCell>
-                <TableCell align="center" sx={{ color: Colors.White }}>
-                  <b>Marca</b>
-                </TableCell>
-                <TableCell align="center" sx={{ color: Colors.White }}>
-                  <b>Modelo</b>
-                </TableCell>
-                <TableCell align="center" sx={{ color: Colors.White }}>
-                  <b>Año</b>
-                </TableCell>
-                <TableCell align="center" sx={{ color: Colors.White }}>
-                  <b>Kilometraje</b>
-                </TableCell>
-                <TableCell align="center" sx={{ color: Colors.White }}>
-                  <b>Acciones</b>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredVehicles.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((vehicle) => (
-                <TableRow key={vehicle.idVehicle} hover>
-                  <TableCell align="center">{vehicle.staticVehicleData.licensePlate}</TableCell>
-                  <TableCell align="center">{vehicle.staticVehicleData.brand}</TableCell>
-                  <TableCell align="center">{vehicle.staticVehicleData.model}</TableCell>
-                  <TableCell align="center">{vehicle.staticVehicleData.year}</TableCell>
-                  <TableCell align="center">{vehicle.nonStaticVehicleData.mileage} km</TableCell>
-                  <TableCell align="center">
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      startIcon={<EditIcon />}
-                      onClick={() => handleEditVehicle(vehicle.idVehicle)}
-                      sx={{ mr: 1 }}
-                    >
-                      Editar
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      startIcon={<DeleteIcon />}
-                      onClick={() => handleDeleteVehicle(vehicle.idVehicle)}
-                    >
-                      Eliminar
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 20]}
-            component="div"
-            count={filteredVehicles.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={(_e, newPage) => setPage(newPage)}
-            onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
-          />
-        </TableContainer>
+        <VehiclesTable
+          vehicles={vehicles}
+          filteredVehicles={filteredVehicles}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          handleEditVehicle={handleEditVehicle}
+          handleDeleteVehicle={handleDeleteVehicle}
+          setPage={setPage}
+          setRowsPerPage={setRowsPerPage}
+        />
       )}
 
       <EditVehicleModal
@@ -213,6 +152,12 @@ const AdminVehiclesScreen: React.FC = () => {
         vehicleId={selectedVehicleId}
         onClose={handleModalClose}
         onVehicleUpdated={handleVehicleUpdated}
+      />
+
+      <AddVehicleModal
+        open={openAddModal}
+        onClose={handleAddModalClose}
+        onVehicleAdded={handleVehicleAdded}
       />
     </Box>
   );

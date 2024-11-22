@@ -20,10 +20,6 @@ import VehicleDiagnosisManagement from "./screens/managers-screen/vehicle-diagno
 import MaintenanceManagementScreen from "./screens/home-admin-screen/screen/admin-diagnosis&maintenance-screens/screens/maintenance-management-screen/MaintenanceManagementScreen";
 import MaintenanceManagement from "./screens/managers-screen/maintenance-management-screen/MaintenanceManagement";
 
-//import RegisterCarScreen from "./screens/register-car-screen/RegisterCarScreen";
-//import RequestMaintenanceScreen from "./screens/request-maintenance-screen/RequestMaintenanceScreen";
-//import MaintenanceProcessScreen from "./screens/maintenance-process-screen/MaintenanceProcessScreen";
-
 const App: React.FC = () => {
   return (
     <Router>
@@ -47,5 +43,7 @@ const App: React.FC = () => {
     </Router>
   );
 };
+
+
 export default App;
 

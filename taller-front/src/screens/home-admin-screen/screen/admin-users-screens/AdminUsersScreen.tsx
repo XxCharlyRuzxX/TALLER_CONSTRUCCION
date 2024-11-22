@@ -1,26 +1,13 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
-  Paper,
-  TextField,
-} from "@mui/material";
+import { Box, Typography, Button, TextField } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { useNavigate } from "react-router-dom";
 import { UserAccount } from "../../../../interfaces/UserAccount";
-import { deleteUser, getAllUsers } from "../../../../services/userService";
-import EditUserModal from "./EditUserModal";
+import { getAllUsers } from "../../../../services/userService";
 import Colors from "../../../../utils/Colors";
+import { handleDeleteUser, handleSearchUsers } from "./functions/userFunctions";
+import UserTable from "./components/UserTable";
+import EditUserModal from "./components/EditUserModal";
+import RegisterUserModal from "./components/AddUserModal";
 
 const AdminUsersScreen: React.FC = () => {
   const [users, setUsers] = useState<UserAccount[]>([]);
@@ -30,8 +17,8 @@ const AdminUsersScreen: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [openModal, setOpenModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [openRegisterModal, setOpenRegisterModal] = useState(false);
 
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -49,40 +36,17 @@ const AdminUsersScreen: React.FC = () => {
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    if (query === "") {
-      setFilteredUsers(users);
-    } else {
-      const filtered = users.filter(
-        (user) =>
-          user.userName.toLowerCase().includes(query.toLowerCase()) ||
-          user.accessCredentials.email.toLowerCase().includes(query.toLowerCase())
-      );
-      setFilteredUsers(filtered);
-    }
+    handleSearchUsers(query, users, setFilteredUsers);
     setPage(0);
   };
 
   const handleAddUser = () => {
-    navigate("/register");
+    setOpenRegisterModal(true);
   };
 
   const handleEditUser = (userId: number) => {
     setSelectedUserId(userId);
     setOpenModal(true);
-  };
-
-  const handleDeleteUser = async (userId: number) => {
-    try {
-      await deleteUser(userId);
-      setUsers((prevUsers) =>
-        prevUsers.filter((user) => user.userId !== userId)
-      );
-      setFilteredUsers((prevFiltered) =>
-        prevFiltered.filter((user) => user.userId !== userId)
-      );
-    } catch (error) {
-      console.error("Error al eliminar el usuario:", error);
-    }
   };
 
   const handleModalClose = () => {
@@ -94,6 +58,20 @@ const AdminUsersScreen: React.FC = () => {
     const updatedUsers = await getAllUsers();
     setUsers(updatedUsers);
     setFilteredUsers(updatedUsers);
+  };
+
+  const handleDelete = async (userId: number) => {
+    await handleDeleteUser(userId, setUsers, setFilteredUsers);
+  };
+
+  const handleUserRegistered = async () => {
+    try {
+      const updatedUsers = await getAllUsers();
+      setUsers(updatedUsers);
+      setFilteredUsers(updatedUsers);
+    } catch (err) {
+      console.error("Error al obtener los usuarios:", err);
+    }
   };
 
   return (
@@ -129,73 +107,28 @@ const AdminUsersScreen: React.FC = () => {
           Agregar Usuario
         </Button>
       </Box>
-      <TableContainer component={Paper} sx={{ borderRadius: "12px", overflow: "hidden" }}>
-        <Table>
-          <TableHead sx={{ backgroundColor: Colors.HighlightGray }}>
-            <TableRow>
-              <TableCell align="center" sx={{ color: Colors.White }}>
-                <b>ID</b>
-              </TableCell>
-              <TableCell align="center" sx={{ color: Colors.White }}>
-                <b>Nombre</b>
-              </TableCell>
-              <TableCell align="center" sx={{ color: Colors.White }}>
-                <b>Email</b>
-              </TableCell>
-              <TableCell align="center" sx={{ color: Colors.White }}>
-                <b>Teléfono</b>
-              </TableCell>
-              <TableCell align="center" sx={{ color: Colors.White }}>
-                <b>Acciones</b>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
-              <TableRow key={user.userId} hover>
-                <TableCell align="center">{user.userId}</TableCell>
-                <TableCell align="center">{user.userName}</TableCell>
-                <TableCell align="center">{user.accessCredentials.email}</TableCell>
-                <TableCell align="center">{user.phone}</TableCell>
-                <TableCell align="center">
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    startIcon={<EditIcon />}
-                    onClick={() => handleEditUser(user.userId)}
-                    sx={{ mr: 1 }}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    startIcon={<DeleteIcon />}
-                    onClick={() => handleDeleteUser(user.userId)}
-                  >
-                    Eliminar
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 20]}
-          component="div"
-          count={filteredUsers.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={(_e, newPage) => setPage(newPage)}
-          onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
-        />
-      </TableContainer>
+
+      <UserTable
+        users={users} // Pasamos users también
+        filteredUsers={filteredUsers}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        onPageChange={(_e, newPage) => setPage(newPage)}
+        onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
+        onEditUser={handleEditUser}
+        onDeleteUser={handleDelete}
+      />
 
       <EditUserModal
         open={openModal}
         userId={selectedUserId}
         onClose={handleModalClose}
         onUserUpdated={handleUserUpdated}
+      />
+      <RegisterUserModal
+        open={openRegisterModal}
+        onClose={() => setOpenRegisterModal(false)}
+        onUserRegistered={handleUserRegistered}
       />
     </Box>
   );

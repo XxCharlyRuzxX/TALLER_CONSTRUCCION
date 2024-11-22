@@ -21,7 +21,6 @@ interface MaintenanceVehicleSectionProps {
   maintenanceStatus: MaintenanceStatus;
 }
 
-// Mapeo de íconos, colores y etiquetas
 const STATUS_MAP = {
   [MaintenanceStatus.COMPLETED]: {
     color: Colors.HighlightGreen,
@@ -52,7 +51,6 @@ const MaintenanceVehicleSection: React.FC<MaintenanceVehicleSectionProps> = ({
 
   return (
     <Paper sx={{ padding: 3, backgroundColor: Colors.PrimaryGray }}>
-      {/* Estado del mantenimiento con ícono */}
       <Box
         sx={{
           display: "flex",
@@ -69,11 +67,10 @@ const MaintenanceVehicleSection: React.FC<MaintenanceVehicleSectionProps> = ({
             fontSize: 22,
           }}
         >
-          {label} {/* Texto dinámico según el estado */}
+          {label}
         </Typography>
       </Box>
 
-      {/* Tabla o mensaje cuando no hay avances */}
       {progresses.length > 0 ? (
         <Table
           sx={{

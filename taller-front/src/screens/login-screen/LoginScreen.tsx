@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Button, TextField, Typography, Box, Link } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { login, getUserType } from "../../services/authService";
-import { UserAccount } from "../../interfaces/UserAccount";
+import { authenticateUser, handleUserRedirection } from "./functions/loginFunctions";
+import Colors from "../../utils/Colors";
 
-const LoginPage: React.FC = () => {
+const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -14,35 +14,9 @@ const LoginPage: React.FC = () => {
     try {
       setError(null);
       const user = await authenticateUser(email, password);
-      await handleUserRedirection(user);
+      await handleUserRedirection(user, navigate);
     } catch (err: any) {
       setError(err.message || "Error en el inicio de sesión");
-    }
-  };
-
-  const authenticateUser = async (email: string, password: string): Promise<UserAccount> => {
-    const loginData = { email, password };
-    const user: UserAccount = await login(loginData);
-    localStorage.setItem("user", JSON.stringify(user));
-    return user;
-  };
-
-  const handleUserRedirection = async (user: UserAccount) => {
-    const userTypeResponse = await getUserType(user.userId);
-    const userType = userTypeResponse.type;
-
-    switch (userType) {
-      case "admin":
-        navigate("/homeadmin");
-        break;
-      case "client":
-        navigate("/userHome");
-        break;
-      case "worker":
-        navigate("/workerHome");
-        break;
-      default:
-        throw new Error("Tipo de usuario no reconocido");
     }
   };
 
@@ -51,30 +25,8 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100vh",
-        backgroundColor: "#F4F4F4",
-      }}
-    >
-      <Box
-        sx={{
-          backgroundColor: "#FFFFFF",
-          padding: "40px",
-          borderRadius: "8px",
-          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-          width: "600px",
-          height: "500px",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100vh", backgroundColor: "#F4F4F4" }}>
+      <Box sx={{ backgroundColor: Colors.White, padding: "40px", borderRadius: "8px", boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)", width: "600px", height: "500px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
         <Typography variant="h5" align="center" gutterBottom>
           BIENVENIDO NUEVAMENTE
         </Typography>
@@ -82,62 +34,16 @@ const LoginPage: React.FC = () => {
           INICIA SESIÓN PARA CONTINUAR
         </Typography>
 
-        <Box
-          sx={{
-            mt: 3,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            width: "100%",
-          }}
-        >
-          <TextField
-            sx={{ width: "80%" }}
-            label="Correo Electrónico"
-            variant="outlined"
-            margin="normal"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <TextField
-            sx={{ width: "80%" }}
-            label="Contraseña"
-            type="password"
-            variant="outlined"
-            margin="normal"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          {error && (
-            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              {error}
-            </Typography>
-          )}
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{ mt: 2, mb: 2, width: "50%" }}
-            onClick={handleLogin}
-            disabled={!email || !password}
-          >
+        <Box sx={{ mt: 3, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%" }}>
+          <TextField sx={{ width: "80%" }} label="Correo Electrónico" variant="outlined" margin="normal" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <TextField sx={{ width: "80%" }} label="Contraseña" type="password" variant="outlined" margin="normal" value={password} onChange={(e) => setPassword(e.target.value)} />
+          {error && <Typography color="error" variant="body2" sx={{ mt: 1 }}>{error}</Typography>}
+          <Button variant="contained" color="primary" sx={{ mt: 2, mb: 2, width: "50%" }} onClick={handleLogin} disabled={!email || !password}>
             Ingresar
           </Button>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            sx={{ mt: 2, width: "80%" }}
-          >
-            <Link
-              component="button"
-              variant="body2"
-              onClick={handleNavigateToRegister}
-            >
-              Crear mi cuenta
-            </Link>
-            <Link variant="body2" onClick={() => alert("Servicio no disponible")}>
-              He olvidado mi contraseña
-            </Link>
+          <Box display="flex" justifyContent="space-between" sx={{ mt: 2, width: "80%" }}>
+            <Link component="button" variant="body2" onClick={handleNavigateToRegister}>Crear mi cuenta</Link>
+            <Link variant="body2" onClick={() => alert("Servicio no disponible")}>He olvidado mi contraseña</Link>
           </Box>
         </Box>
       </Box>
@@ -145,4 +51,4 @@ const LoginPage: React.FC = () => {
   );
 };
 
-export default LoginPage;
+export default LoginScreen;
