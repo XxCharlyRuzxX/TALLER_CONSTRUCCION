@@ -9,6 +9,7 @@ import com.taller.sistema_taller.model.MaintenanceManagement.MaintenanceStatus;
 import com.taller.sistema_taller.repositories.MaintenanceManagerRepository;
 import com.taller.sistema_taller.service.maintenance_service.interfaces.MaintenanceManagerServiceInterface;
 import com.taller.sistema_taller.service.maintenance_service.maintenance_validations.MaintenanceValidator;
+
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,63 +33,61 @@ public class MaintenanceManagerService implements MaintenanceManagerServiceInter
     @Override
     @Transactional
     public MaintenanceManagerDTO addMaintenanceAdvance(Long managerId, MaintenanceAdvanceDTO advanceDTO) {
-        MaintenanceManager manager = maintenanceManagerRepository.findById(managerId)
-                .orElseThrow(() -> new MaintenanceManagerNotFoundException("Maintenance Manager not found"));
+        MaintenanceManager manager = findMaintenanceManagerById(managerId);
 
-        maintenanceValidator.validateAdvance(advanceDTO);
+        maintenanceValidator.validateMaintenanceAdvance(advanceDTO);
 
-        MaintenanceAdvance advance = new MaintenanceAdvance(advanceDTO.getDate(), advanceDTO.getDescription());
-        // advanceDTO.getImagesAdvance().forEach(advance::addImage);
+        if (advanceDTO.getImagesAdvance() == null || advanceDTO.getImagesAdvance().isEmpty()) {
+            manager.addMaintenanceAdvanceWithoutImage(advanceDTO.getDescription());
+        } else {
+            manager.addMaintenanceAdvanceWithImages(advanceDTO.getDescription(), advanceDTO.getImagesAdvance());
+        }
 
-        manager.getMaintenanceProgresses().add(advance);
-        maintenanceManagerRepository.save(manager);
+        saveMaintenanceManager(manager);
 
-        return convertToDTO(manager);
+        return mapToMaintenanceManagerDTO(manager);
     }
 
     @Override
     @Transactional
     public boolean updateMaintenanceStatus(Long managerId, String status) {
-        MaintenanceManager manager = maintenanceManagerRepository.findById(managerId)
-                .orElseThrow(() -> new MaintenanceManagerNotFoundException("Maintenance Manager not found"));
+        MaintenanceManager manager = findMaintenanceManagerById(managerId);
 
-        maintenanceValidator.validateStatus(status);
+        maintenanceValidator.validateMaintenanceStatus(status);
 
         manager.setMaintenanceStatus(MaintenanceStatus.valueOf(status));
-        maintenanceManagerRepository.save(manager);
+
+        saveMaintenanceManager(manager);
         return true;
     }
 
     @Override
     public MaintenanceManagerDTO getMaintenanceManager(Long managerId) {
-        MaintenanceManager manager = maintenanceManagerRepository.findById(managerId)
-                .orElseThrow(() -> new MaintenanceManagerNotFoundException("Maintenance Manager not found"));
-        return convertToDTO(manager);
+        MaintenanceManager manager = findMaintenanceManagerById(managerId);
+        return mapToMaintenanceManagerDTO(manager);
     }
 
     @Override
     public MaintenanceAdvanceDTO getMaintenanceAdvanceById(Long managerId, Long advanceId) {
-        MaintenanceManager manager = maintenanceManagerRepository.findById(managerId)
-                .orElseThrow(() -> new MaintenanceManagerNotFoundException("Maintenance Manager not found"));
+        MaintenanceManager manager = findMaintenanceManagerById(managerId);
 
-        MaintenanceAdvance advance = manager.getMaintenanceAdvanceById(advanceId);
-        if (advance == null) {
-            throw new MaintenanceAdvanceNotFoundException("Maintenance Advance not found");
-        }
-        return convertAdvanceToDTO(advance);
+        MaintenanceAdvance advance = findMaintenanceAdvanceById(manager, advanceId);
+
+        return mapToMaintenanceAdvanceDTO(advance);
     }
 
     @Override
     @Transactional
     public boolean deleteMaintenanceAdvanceById(Long managerId, Long advanceId) {
-        MaintenanceManager manager = maintenanceManagerRepository.findById(managerId)
-                .orElseThrow(() -> new MaintenanceManagerNotFoundException("Maintenance Manager not found"));
+        MaintenanceManager manager = findMaintenanceManagerById(managerId);
 
         boolean removed = manager.removeMaintenanceAdvancebyId(advanceId);
-        maintenanceManagerRepository.save(manager);
+
         if (!removed) {
-            throw new MaintenanceAdvanceNotFoundException("Maintenance Advance not found");
+            throw new MaintenanceAdvanceNotFoundException("Maintenance Advance not found with ID: " + advanceId);
         }
+
+        saveMaintenanceManager(manager);
         return true;
     }
 
@@ -96,50 +95,68 @@ public class MaintenanceManagerService implements MaintenanceManagerServiceInter
     @Transactional
     public MaintenanceAdvanceDTO updateMaintenanceAdvance(Long managerId, Long advanceId,
             MaintenanceAdvanceDTO advanceDTO) {
-        MaintenanceManager manager = maintenanceManagerRepository.findById(managerId)
-                .orElseThrow(() -> new MaintenanceManagerNotFoundException("Maintenance Manager not found"));
+        MaintenanceManager manager = findMaintenanceManagerById(managerId);
+        MaintenanceAdvance advance = findMaintenanceAdvanceById(manager, advanceId);
 
-        MaintenanceAdvance advance = manager.getMaintenanceAdvanceById(advanceId);
-        if (advance == null) {
-            throw new MaintenanceAdvanceNotFoundException("Maintenance Advance not found");
-        }
+        maintenanceValidator.validateMaintenanceAdvance(advanceDTO);
 
-        maintenanceValidator.validateAdvance(advanceDTO);
+        updateMaintenanceAdvanceDetails(advance, advanceDTO);
 
-        advance.setDescription(advanceDTO.getDescription());
-        advance.getImagesAdvance().clear();
-        advance.getImagesAdvance().addAll(advanceDTO.getImagesAdvance());
-        maintenanceManagerRepository.save(manager);
+        saveMaintenanceManager(manager);
 
-        return convertAdvanceToDTO(advance);
+        return mapToMaintenanceAdvanceDTO(advance);
     }
 
     @Override
     public List<MaintenanceAdvanceDTO> getAllMaintenanceAdvances() {
-        List<MaintenanceManager> managers = maintenanceManagerRepository.findAll();
-        return managers.stream()
+        return maintenanceManagerRepository.findAll().stream()
                 .flatMap(manager -> manager.getMaintenanceProgresses().stream())
-                .map(this::convertAdvanceToDTO)
+                .map(this::mapToMaintenanceAdvanceDTO)
                 .collect(Collectors.toList());
     }
 
-    private MaintenanceManagerDTO convertToDTO(MaintenanceManager manager) {
+    private MaintenanceManager findMaintenanceManagerById(Long managerId) {
+        return maintenanceManagerRepository.findById(managerId)
+                .orElseThrow(() -> new MaintenanceManagerNotFoundException(
+                        "Maintenance Manager not found with ID: " + managerId));
+    }
+
+    private MaintenanceAdvance findMaintenanceAdvanceById(MaintenanceManager manager, Long advanceId) {
+        MaintenanceAdvance advance = manager.getMaintenanceAdvanceById(advanceId);
+        if (advance == null) {
+            throw new MaintenanceAdvanceNotFoundException("Maintenance Advance not found with ID: " + advanceId);
+        }
+        return advance;
+    }
+
+    private void saveMaintenanceManager(MaintenanceManager manager) {
+        maintenanceManagerRepository.save(manager);
+    }
+
+    private void updateMaintenanceAdvanceDetails(MaintenanceAdvance advance, MaintenanceAdvanceDTO dto) {
+        advance.setDescription(dto.getDescription());
+        advance.getImagesAdvance().clear();
+        if (dto.getImagesAdvance() != null) {
+            advance.getImagesAdvance().addAll(dto.getImagesAdvance());
+        }
+    }
+
+    private MaintenanceManagerDTO mapToMaintenanceManagerDTO(MaintenanceManager manager) {
         MaintenanceManagerDTO dto = new MaintenanceManagerDTO();
         dto.setIdMaintenanceManager(manager.getIdMaintenanceManager());
         dto.setMaintenanceStatus(manager.getMaintenanceStatus().name());
         dto.setMaintenanceProgresses(manager.getMaintenanceProgresses().stream()
-                .map(this::convertAdvanceToDTO)
+                .map(this::mapToMaintenanceAdvanceDTO)
                 .collect(Collectors.toList()));
         return dto;
     }
 
-    @Transactional
-    private MaintenanceAdvanceDTO convertAdvanceToDTO(MaintenanceAdvance advance) {
+    private MaintenanceAdvanceDTO mapToMaintenanceAdvanceDTO(MaintenanceAdvance advance) {
         MaintenanceAdvanceDTO dto = new MaintenanceAdvanceDTO();
         dto.setIdMaintenanceAdvance(advance.getIdMaintenanceAdvance());
         dto.setDate(advance.getDate());
         dto.setDescription(advance.getDescription());
-        // dto.setImagesAdvance(advance.getImagesAdvance());
+        dto.setImagesAdvance(advance.getImagesAdvance());
         return dto;
     }
 }

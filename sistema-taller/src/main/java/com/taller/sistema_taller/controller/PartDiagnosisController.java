@@ -25,7 +25,7 @@ public class PartDiagnosisController {
     public ResponseEntity<PartDiagnosisDTO> addPart(
             @PathVariable Long diagnosisId,
             @RequestBody PartDiagnosisDTO partDto) {
-        PartDiagnosisDTO part = partDiagnosisService.addPart(diagnosisId, partDto);
+        PartDiagnosisDTO part = partDiagnosisService.addPartToDiagnosis(diagnosisId, partDto);
         return new ResponseEntity<>(part, HttpStatus.CREATED);
     }
 
@@ -40,14 +40,14 @@ public class PartDiagnosisController {
     @GetMapping
     public ResponseEntity<List<PartDiagnosisDTO>> getAllParts(
             @PathVariable Long diagnosisId) {
-        return ResponseEntity.ok(partDiagnosisService.getAllParts(diagnosisId));
+        return ResponseEntity.ok(partDiagnosisService.getlistAllParts(diagnosisId));
     }
 
     @DeleteMapping("/{partId}")
     public ResponseEntity<Void> removePartById(
             @PathVariable Long diagnosisId,
             @PathVariable Long partId) {
-        boolean removed = partDiagnosisService.removePartById(diagnosisId, partId);
+        boolean removed = partDiagnosisService.deletePartFromDiagnosis(diagnosisId, partId);
         return removed ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
@@ -56,7 +56,7 @@ public class PartDiagnosisController {
             @PathVariable Long diagnosisId,
             @PathVariable Long partId,
             @RequestParam PartDiagnosis.ShippingStatus status) {
-        partDiagnosisService.updatePartStatus(diagnosisId, partId, status);
+        partDiagnosisService.updatePartShippingStatus(diagnosisId, partId, status);
         return ResponseEntity.ok().build();
     }
 

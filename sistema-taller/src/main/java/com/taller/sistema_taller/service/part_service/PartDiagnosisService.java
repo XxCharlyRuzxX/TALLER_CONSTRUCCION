@@ -5,6 +5,7 @@ import com.taller.sistema_taller.exceptions.diagnosis_exceptions.DiagnosisManage
 import com.taller.sistema_taller.exceptions.part_diagnosis_exceptions.PartNotFoundException;
 import com.taller.sistema_taller.model.VehicleManagement.DiagnosisManager;
 import com.taller.sistema_taller.model.VehicleManagement.PartDiagnosis;
+import com.taller.sistema_taller.model.VehicleManagement.VehicleDiagnosis;
 import com.taller.sistema_taller.repositories.DiagnosisManagerRepository;
 import com.taller.sistema_taller.service.part_service.interfaces.PartDiagnosisServiceInterface;
 import com.taller.sistema_taller.service.part_service.part_diagnosis_validations.PartDiagnosisValidator;
@@ -31,110 +32,112 @@ public class PartDiagnosisService implements PartDiagnosisServiceInterface {
 
   @Override
   @Transactional
-  public PartDiagnosisDTO addPart(Long diagnosisId, PartDiagnosisDTO partDto) {
-    partDiagnosisValidator.validatePartData(partDto); // Validación de datos
-    DiagnosisManager diagnosisManager = diagnosisManagerRepository.findById(diagnosisId)
-        .orElseThrow(
-            () -> new DiagnosisManagerNotFoundException("Diagnosis Manager with ID " + diagnosisId + " not found"));
+  public PartDiagnosisDTO addPartToDiagnosis(Long diagnosisId, PartDiagnosisDTO partDto) {
+    partDiagnosisValidator.validatePartData(partDto);
 
-    PartDiagnosis part = convertToPartDiagnosis(partDto);
-    diagnosisManager.getDiagnoses().stream()
-        .filter(diagnosis -> diagnosis.getIdDiagnosis().equals(diagnosisId))
-        .findFirst()
-        .orElseThrow(() -> new PartNotFoundException("Diagnosis with ID " + diagnosisId + " not found"))
-        .addPart(part);
+    VehicleDiagnosis diagnosis = getVehicleDiagnosisById(diagnosisId);
+    PartDiagnosis part = mapToPartDiagnosis(partDto);
 
-    diagnosisManagerRepository.save(diagnosisManager);
-    return convertToPartDiagnosisDTO(part);
+    diagnosis.addPart(part);
+    saveDiagnosisManager(diagnosisId);
+
+    return mapToPartDiagnosisDTO(part);
   }
 
   @Override
   @Transactional
-  public boolean removePartById(Long diagnosisId, Long partId) {
-    DiagnosisManager diagnosisManager = diagnosisManagerRepository.findById(diagnosisId)
-        .orElseThrow(
-            () -> new DiagnosisManagerNotFoundException("Diagnosis Manager with ID " + diagnosisId + " not found"));
+  public boolean deletePartFromDiagnosis(Long diagnosisId, Long partId) {
+    VehicleDiagnosis diagnosis = getVehicleDiagnosisById(diagnosisId);
 
-    boolean removed = diagnosisManager.getDiagnoses().stream()
-        .filter(diagnosis -> diagnosis.getIdDiagnosis().equals(diagnosisId))
-        .findFirst()
-        .orElseThrow(() -> new PartNotFoundException("Diagnosis with ID " + diagnosisId + " not found"))
-        .getPartsList()
-        .removeIf(part -> part.getIdPart().equals(partId));
+    boolean isRemoved = removePartFromDiagnosis(diagnosis, partId);
+    if (isRemoved) {
+      saveDiagnosisManager(diagnosisId);
+    }
 
-    diagnosisManagerRepository.save(diagnosisManager);
-    return removed;
+    return isRemoved;
   }
 
   @Override
   public PartDiagnosisDTO getPartById(Long diagnosisId, Long partId) {
-    DiagnosisManager diagnosisManager = diagnosisManagerRepository.findById(diagnosisId)
-        .orElseThrow(
-            () -> new DiagnosisManagerNotFoundException("Diagnosis Manager with ID " + diagnosisId + " not found"));
+    VehicleDiagnosis diagnosis = getVehicleDiagnosisById(diagnosisId);
+    PartDiagnosis part = getPartFromDiagnosis(diagnosis, partId);
 
-    PartDiagnosis part = diagnosisManager.getDiagnoses().stream()
-        .filter(diagnosis -> diagnosis.getIdDiagnosis().equals(diagnosisId))
-        .findFirst()
-        .orElseThrow(() -> new PartNotFoundException("Diagnosis with ID " + diagnosisId + " not found"))
-        .getPartsList().stream()
-        .filter(p -> p.getIdPart().equals(partId))
-        .findFirst()
-        .orElseThrow(() -> new PartNotFoundException("Part with ID " + partId + " not found"));
-
-    return convertToPartDiagnosisDTO(part);
+    return mapToPartDiagnosisDTO(part);
   }
 
   @Override
-  public List<PartDiagnosisDTO> getAllParts(Long diagnosisId) {
-    DiagnosisManager diagnosisManager = diagnosisManagerRepository.findById(diagnosisId)
-        .orElseThrow(
-            () -> new DiagnosisManagerNotFoundException("Diagnosis Manager with ID " + diagnosisId + " not found"));
+  public List<PartDiagnosisDTO> getlistAllParts(Long diagnosisId) {
+    VehicleDiagnosis diagnosis = getVehicleDiagnosisById(diagnosisId);
 
-    return diagnosisManager.getDiagnoses().stream()
-        .filter(diagnosis -> diagnosis.getIdDiagnosis().equals(diagnosisId))
-        .findFirst()
-        .orElseThrow(() -> new PartNotFoundException("Diagnosis with ID " + diagnosisId + " not found"))
-        .getPartsList().stream()
-        .map(this::convertToPartDiagnosisDTO)
+    return diagnosis.getPartsList().stream()
+        .map(this::mapToPartDiagnosisDTO)
         .collect(Collectors.toList());
   }
 
   @Override
   @Transactional
-  public void updatePartStatus(Long diagnosisId, Long partId, PartDiagnosis.ShippingStatus status) {
-    DiagnosisManager diagnosisManager = diagnosisManagerRepository.findById(diagnosisId)
-        .orElseThrow(
-            () -> new DiagnosisManagerNotFoundException("Diagnosis Manager with ID " + diagnosisId + " not found"));
+  public void updatePartShippingStatus(Long diagnosisId, Long partId, PartDiagnosis.ShippingStatus status) {
+    VehicleDiagnosis diagnosis = getVehicleDiagnosisById(diagnosisId);
+    PartDiagnosis part = getPartFromDiagnosis(diagnosis, partId);
 
-    PartDiagnosis part = diagnosisManager.getDiagnoses().stream()
-        .filter(diagnosis -> diagnosis.getIdDiagnosis().equals(diagnosisId))
-        .findFirst()
-        .orElseThrow(() -> new PartNotFoundException("Diagnosis with ID " + diagnosisId + " not found"))
-        .getPartsList().stream()
-        .filter(p -> p.getIdPart().equals(partId))
-        .findFirst()
-        .orElseThrow(() -> new PartNotFoundException("Part with ID " + partId + " not found"));
-
-    part.setShippingStatus(status);
-    diagnosisManagerRepository.save(diagnosisManager);
+    updateShippingStatus(part, status);
+    saveDiagnosisManager(diagnosisId);
   }
 
   @Override
   public float calculateTotalPartCost(Long diagnosisId) {
-    DiagnosisManager diagnosisManager = diagnosisManagerRepository.findById(diagnosisId)
-        .orElseThrow(
-            () -> new DiagnosisManagerNotFoundException("Diagnosis Manager with ID " + diagnosisId + " not found"));
+    VehicleDiagnosis diagnosis = getVehicleDiagnosisById(diagnosisId);
 
-    return (float) diagnosisManager.getDiagnoses().stream()
+    return calculateTotalCost(diagnosis);
+  }
+
+  private VehicleDiagnosis getVehicleDiagnosisById(Long diagnosisId) {
+    DiagnosisManager diagnosisManager = findDiagnosisManager(diagnosisId);
+    return findDiagnosis(diagnosisManager, diagnosisId);
+  }
+
+  private DiagnosisManager findDiagnosisManager(Long diagnosisId) {
+    return diagnosisManagerRepository.findById(diagnosisId)
+        .orElseThrow(() -> new DiagnosisManagerNotFoundException(
+            "Diagnosis Manager with ID " + diagnosisId + " not found"));
+  }
+
+  private VehicleDiagnosis findDiagnosis(DiagnosisManager diagnosisManager, Long diagnosisId) {
+    return diagnosisManager.getDiagnoses().stream()
         .filter(diagnosis -> diagnosis.getIdDiagnosis().equals(diagnosisId))
         .findFirst()
-        .orElseThrow(() -> new PartNotFoundException("Diagnosis with ID " + diagnosisId + " not found"))
-        .getPartsList().stream()
+        .orElseThrow(() -> new PartNotFoundException(
+            "Diagnosis with ID " + diagnosisId + " not found"));
+  }
+
+  private PartDiagnosis getPartFromDiagnosis(VehicleDiagnosis diagnosis, Long partId) {
+    return diagnosis.getPartsList().stream()
+        .filter(part -> part.getIdPart().equals(partId))
+        .findFirst()
+        .orElseThrow(() -> new PartNotFoundException(
+            "Part with ID " + partId + " not found"));
+  }
+
+  private boolean removePartFromDiagnosis(VehicleDiagnosis diagnosis, Long partId) {
+    return diagnosis.getPartsList().removeIf(part -> part.getIdPart().equals(partId));
+  }
+
+  private void updateShippingStatus(PartDiagnosis part, PartDiagnosis.ShippingStatus status) {
+    part.setShippingStatus(status);
+  }
+
+  private void saveDiagnosisManager(Long diagnosisId) {
+    DiagnosisManager diagnosisManager = findDiagnosisManager(diagnosisId);
+    diagnosisManagerRepository.save(diagnosisManager);
+  }
+
+  private float calculateTotalCost(VehicleDiagnosis diagnosis) {
+    return (float) diagnosis.getPartsList().stream()
         .mapToDouble(PartDiagnosis::getPartCost)
         .sum();
   }
 
-  private PartDiagnosis convertToPartDiagnosis(PartDiagnosisDTO dto) {
+  private PartDiagnosis mapToPartDiagnosis(PartDiagnosisDTO dto) {
     PartDiagnosis part = new PartDiagnosis();
     part.setPartDetail(dto.getPartDetail());
     part.setPartCost(dto.getPartCost());
@@ -143,7 +146,7 @@ public class PartDiagnosisService implements PartDiagnosisServiceInterface {
     return part;
   }
 
-  private PartDiagnosisDTO convertToPartDiagnosisDTO(PartDiagnosis part) {
+  private PartDiagnosisDTO mapToPartDiagnosisDTO(PartDiagnosis part) {
     PartDiagnosisDTO dto = new PartDiagnosisDTO();
     dto.setIdPart(part.getIdPart());
     dto.setPartDetail(part.getPartDetail());

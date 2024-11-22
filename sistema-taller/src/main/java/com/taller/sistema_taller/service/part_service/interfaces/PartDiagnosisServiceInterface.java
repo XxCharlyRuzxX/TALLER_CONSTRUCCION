@@ -6,15 +6,15 @@ import java.util.List;
 
 public interface PartDiagnosisServiceInterface {
 
-  PartDiagnosisDTO addPart(Long diagnosisId, PartDiagnosisDTO partDto);
+  PartDiagnosisDTO addPartToDiagnosis(Long diagnosisId, PartDiagnosisDTO partDto);
 
-  boolean removePartById(Long diagnosisId, Long partId);
+  boolean deletePartFromDiagnosis(Long diagnosisId, Long partId);
 
   PartDiagnosisDTO getPartById(Long diagnosisId, Long partId);
 
-  List<PartDiagnosisDTO> getAllParts(Long diagnosisId);
+  List<PartDiagnosisDTO> getlistAllParts(Long diagnosisId);
 
-  void updatePartStatus(Long diagnosisId, Long partId, PartDiagnosis.ShippingStatus status);
+  void updatePartShippingStatus(Long diagnosisId, Long partId, PartDiagnosis.ShippingStatus status);
 
   float calculateTotalPartCost(Long diagnosisId);
 }

@@ -12,19 +12,29 @@ import com.taller.sistema_taller.repositories.UserAccountRepository;
 @Component
 public class UserValidator {
 
+    private static final int MIN_PASSWORD_LENGTH = 8;
+    private static final int PHONE_NUMBER_LENGTH = 10;
+    private static final String PHONE_NUMBER_REGEX = "\\d+";
+
     private final UserAccountRepository userAccountRepository;
 
     public UserValidator(UserAccountRepository userAccountRepository) {
         this.userAccountRepository = userAccountRepository;
     }
 
+    public void validateRegisterData(UserDTO userDto, String userType) {
+        validateUserData(userDto);
+        validateUserType(userType);
+        validateEmailIsUnique(userDto.getEmail());
+    }
+
     public void validateUserType(String userType) {
-        if (!userType.equalsIgnoreCase("admin") && !userType.equalsIgnoreCase("client") && !userType.equalsIgnoreCase("worker")) {
+        if (!isValidUserType(userType)) {
             throw new InvalidUserTypeException("Tipo de usuario no válido: " + userType);
         }
     }
 
-    public void validateEmailUniqueness(String email) {
+    public void validateEmailIsUnique(String email) {
         if (userAccountRepository.existsByAccessCredentials_Email(email)) {
             throw new InvalidDataException("El email ya está en uso");
         }
@@ -37,8 +47,9 @@ public class UserValidator {
     }
 
     public void validateLoginCredentials(String email, String password) {
-        boolean isValid = userAccountRepository.findAll().stream()
-                .anyMatch(user -> user.getAccessCredentials().validateCredentials(email, password));
+        boolean isValid = userAccountRepository.findByAccessCredentialsEmail(email)
+                .map(user -> user.getAccessCredentials().validateCredentials(email, password))
+                .orElse(false);
         if (!isValid) {
             throw new InvalidCredentialsException("Credenciales inválidas");
         }
@@ -49,19 +60,24 @@ public class UserValidator {
             throw new InvalidDataException("El usuario no puede ser nulo.");
         }
         validatePassword(userDTO.getPassword());
-        validateUserPhone(userDTO.getPhone());
+        validatePhone(userDTO.getPhone());
     }
 
     private void validatePassword(String password) {
-        if (password == null || password.length() < 8) {
+        if (password == null || password.length() < MIN_PASSWORD_LENGTH) {
             throw new InvalidDataException("La contraseña debe contener al menos 8 caracteres");
         }
     }
 
-    private void validateUserPhone(String phone) {
-        if (phone == null || phone.length() != 10 || !phone.matches("\\d+")) {
+    private void validatePhone(String phone) {
+        if (phone == null || phone.length() != PHONE_NUMBER_LENGTH || !phone.matches(PHONE_NUMBER_REGEX)) {
             throw new InvalidDataException("El teléfono debe tener exactamente 10 caracteres numéricos");
         }
     }
-}
 
+    private boolean isValidUserType(String userType) {
+        return userType.equalsIgnoreCase("admin")
+                || userType.equalsIgnoreCase("client")
+                || userType.equalsIgnoreCase("worker");
+    }
+}

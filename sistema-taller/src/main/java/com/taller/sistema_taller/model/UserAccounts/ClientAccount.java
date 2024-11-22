@@ -1,5 +1,10 @@
 package com.taller.sistema_taller.model.UserAccounts;
 
+import com.taller.sistema_taller.model.InvoiceGeneration.Invoice;
+import com.taller.sistema_taller.model.InvoiceGeneration.InvoiceGenerator;
+import com.taller.sistema_taller.model.MaintenanceManagement.MaintenanceStatus;
+import com.taller.sistema_taller.model.VehicleManagement.ClientVehicle;
+
 import jakarta.persistence.Entity;
 
 @Entity
@@ -11,20 +16,35 @@ public class ClientAccount extends UserAccount {
 
     public ClientAccount(){}
 
-    public void authorizeDiagnostic() {
+    public void authorizeDiagnostic(ClientVehicle vehicle) {
+        if (vehicle == null) {
+            throw new IllegalArgumentException("Vehicle cannot be null");
+        }
 
+        vehicle.getDiagnosisManager().getDiagnoses().forEach(diagnosis -> {
+            if (!diagnosis.isAuthorized()) {
+                diagnosis.setAuthorized(true);
+            }
+        });
     }
 
-    public void requestInvoice() {
 
+    public byte[] requestInvoice(ClientVehicle vehicle, float total) {
+        if (vehicle == null) {
+            throw new IllegalArgumentException("Vehicle cannot be null");
+        }
+
+        InvoiceGenerator invoiceGenerator = new InvoiceGenerator();
+        Invoice invoice = invoiceGenerator.generateInvoice(this, vehicle, total);
+        return invoiceGenerator.exportInvoiceToPDF(invoice);
     }
 
-    public void completeSatisfactionSurvey() {
 
-    }
+    public MaintenanceStatus  checkVehicleStatus(ClientVehicle vehicle) {
+        if (vehicle == null) {
+            throw new IllegalArgumentException("Vehicle cannot be null");
+        }
 
-    public String checkVehicleStatus() {
-
-        return null;
+        return vehicle.getMaintenanceManager().getMaintenanceStatus();
     }
 }

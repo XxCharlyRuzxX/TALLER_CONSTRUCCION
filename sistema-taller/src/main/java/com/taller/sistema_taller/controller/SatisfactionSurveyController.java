@@ -24,7 +24,7 @@ public class SatisfactionSurveyController {
 
     @PostMapping
     public ResponseEntity<SatisfactionSurvey> createSurvey(@RequestBody SatisfactionSurveyDTO surveyDTO) {
-        SatisfactionSurvey survey = surveyService.createSurvey(surveyDTO);
+        SatisfactionSurvey survey = surveyService.registerSurvey(surveyDTO);
         return ResponseEntity.ok(survey);
     }
 

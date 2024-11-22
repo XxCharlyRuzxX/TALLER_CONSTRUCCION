@@ -2,10 +2,7 @@ package com.taller.sistema_taller.service.vehicle_service;
 
 import com.taller.sistema_taller.dto.ClientVehicleDTO;
 import com.taller.sistema_taller.exceptions.vehicle_exceptions.*;
-import com.taller.sistema_taller.model.VehicleManagement.ClientVehicle;
-import com.taller.sistema_taller.model.VehicleManagement.DiagnosisManager;
-import com.taller.sistema_taller.model.VehicleManagement.StaticVehicleData;
-import com.taller.sistema_taller.model.VehicleManagement.NonStaticVehicleData;
+import com.taller.sistema_taller.model.VehicleManagement.*;
 import com.taller.sistema_taller.repositories.ClientVehicleRepository;
 import com.taller.sistema_taller.service.vehicle_service.interfaces.ClientVehicleServiceInterface;
 import com.taller.sistema_taller.service.vehicle_service.vehicle_validations.ClientVehicleValidator;
@@ -18,6 +15,9 @@ import java.util.List;
 
 @Service
 public class ClientVehicleService implements ClientVehicleServiceInterface {
+
+    private static final String VEHICLE_NOT_FOUND_MSG = "Vehículo con ID %s no encontrado";
+    private static final String DIAGNOSIS_NOT_FOUND_MSG = "Diagnóstico no encontrado para el usuario con ID %s";
 
     private final ClientVehicleRepository clientVehicleRepository;
     private final ClientVehicleValidator clientVehicleValidator;
@@ -32,10 +32,50 @@ public class ClientVehicleService implements ClientVehicleServiceInterface {
     @Override
     @Transactional
     public ClientVehicle registerVehicle(ClientVehicleDTO vehicleDto) {
-        clientVehicleValidator.validateClientVehicleData(vehicleDto);
-        clientVehicleValidator.validateLicensePlateUniqueness(vehicleDto.getLicensePlate());
-        clientVehicleValidator.validateClientVehicleData(vehicleDto);
+        clientVehicleValidator.validateClientVehicle(vehicleDto);
+        ClientVehicle newVehicle = createClientVehicleFromDTO(vehicleDto);
+        return clientVehicleRepository.save(newVehicle);
+    }
 
+    @Override
+    @Transactional
+    public ClientVehicle updateVehicle(String vehicleId, ClientVehicleDTO vehicleDto) {
+        ClientVehicle existingVehicle = findVehicleById(vehicleId);
+        clientVehicleValidator.validateClientVehicleData(vehicleDto);
+        updateClientVehicleFromDTO(existingVehicle, vehicleDto);
+        return clientVehicleRepository.save(existingVehicle);
+    }
+
+    @Override
+    @Transactional
+    public void deleteVehicle(String vehicleId) {
+        clientVehicleRepository.delete(findVehicleById(vehicleId));
+    }
+
+    @Override
+    public ClientVehicle findVehicleById(String vehicleId) {
+        return clientVehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new VehicleNotFoundException(String.format(VEHICLE_NOT_FOUND_MSG, vehicleId)));
+    }
+
+    @Override
+    public List<ClientVehicle> findAllVehiclesByClient(Long clientId) {
+        return clientVehicleRepository.findAllByClientId(clientId);
+    }
+
+    @Override
+    public DiagnosisManager getDiagnosisManagerByUserId(Long userId) {
+        return clientVehicleRepository.findByClientId(userId)
+                .map(ClientVehicle::getDiagnosisManager)
+                .orElseThrow(() -> new VehicleNotFoundException(String.format(DIAGNOSIS_NOT_FOUND_MSG, userId)));
+    }
+
+    @Override
+    public List<ClientVehicle> findAllVehicles() {
+        return clientVehicleRepository.findAll();
+    }
+
+    private ClientVehicle createClientVehicleFromDTO(ClientVehicleDTO vehicleDto) {
         StaticVehicleData staticData = new StaticVehicleData(
                 vehicleDto.getBrand(),
                 vehicleDto.getModel(),
@@ -45,65 +85,21 @@ public class ClientVehicleService implements ClientVehicleServiceInterface {
                 vehicleDto.getMileage(),
                 vehicleDto.getFuelLevel(),
                 vehicleDto.getAdditionalObservations());
-
-        ClientVehicle newVehicle = new ClientVehicle(vehicleDto.getClientId(), staticData, nonStaticData);
-        return clientVehicleRepository.save(newVehicle);
+        return new ClientVehicle(vehicleDto.getClientId(), staticData, nonStaticData);
     }
 
-    @Override
-    @Transactional
-    public ClientVehicle updateVehicle(String vehicleId, ClientVehicleDTO vehicleDto) {
-        clientVehicleValidator.validateVehicleExists(vehicleId);
-        clientVehicleValidator.validateClientVehicleData(vehicleDto);
-
-        ClientVehicle existingVehicle = clientVehicleRepository.findById(vehicleId)
-                .orElseThrow(() -> new VehicleNotFoundException("Vehículo con ID " + vehicleId + " no encontrado"));
-
+    private void updateClientVehicleFromDTO(ClientVehicle vehicle, ClientVehicleDTO vehicleDto) {
         StaticVehicleData updatedStaticData = new StaticVehicleData(
                 vehicleDto.getBrand(),
                 vehicleDto.getModel(),
                 vehicleDto.getYear(),
                 vehicleDto.getLicensePlate());
-        existingVehicle.updateStaticVehicleData(updatedStaticData);
+        vehicle.updateStaticVehicleData(updatedStaticData);
 
         NonStaticVehicleData updatedNonStaticData = new NonStaticVehicleData(
                 vehicleDto.getMileage(),
                 vehicleDto.getFuelLevel(),
                 vehicleDto.getAdditionalObservations());
-        existingVehicle.updateNonStaticVehicleData(updatedNonStaticData);
-
-        return clientVehicleRepository.save(existingVehicle);
+        vehicle.updateNonStaticVehicleData(updatedNonStaticData);
     }
-
-    @Override
-    @Transactional
-    public void deleteVehicle(String vehicleId) {
-        clientVehicleValidator.validateVehicleExists(vehicleId);
-        clientVehicleRepository.deleteById(vehicleId);
-    }
-
-    @Override
-    public ClientVehicle findVehicleById(String vehicleId) {
-        clientVehicleValidator.validateVehicleExists(vehicleId);
-        return clientVehicleRepository.findById(vehicleId)
-                .orElseThrow(() -> new VehicleNotFoundException("Vehículo con ID " + vehicleId + " no encontrado"));
-    }
-
-    @Override
-    public List<ClientVehicle> findAllVehiclesByClient(Long clientId) {
-        return clientVehicleRepository.findAllByClientId(clientId);
-    }
-
-    public DiagnosisManager getDiagnosisManagerByUserId(Long userId) {
-        return clientVehicleRepository.findByClientId(userId)
-                .map(ClientVehicle::getDiagnosisManager)
-                .orElseThrow(() -> new VehicleNotFoundException(
-                        "Diagnóstico no encontrado para el usuario con ID " + userId));
-    }
-
-    @Override
-    public List<ClientVehicle> findAllVehicles() {
-        return clientVehicleRepository.findAll();
-    }
-
 }

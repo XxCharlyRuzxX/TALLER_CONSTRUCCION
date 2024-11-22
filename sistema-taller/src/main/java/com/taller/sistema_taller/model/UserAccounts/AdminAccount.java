@@ -4,7 +4,6 @@ import com.taller.sistema_taller.model.InvoiceGeneration.Invoice;
 import com.taller.sistema_taller.model.InvoiceGeneration.InvoiceGenerator;
 import com.taller.sistema_taller.model.MaintenanceManagement.MaintenanceAdvance;
 import com.taller.sistema_taller.model.MaintenanceManagement.MaintenanceStatus;
-import com.taller.sistema_taller.model.SatisfactionSurveys.SatisfactionSurvey;
 import com.taller.sistema_taller.model.VehicleManagement.ClientVehicle;
 import java.util.List;
 import jakarta.persistence.Entity;
@@ -19,14 +18,8 @@ public class AdminAccount extends UserAccount {
     }
 
 
-    public void authorizeVehicleMaintenance(ClientVehicle vehicle) {
-        vehicle.getMaintenanceManager().setMaintenanceStatus(MaintenanceStatus.IN_PROGRESS);
-        // checar que mas hace
-    }
-
-    public List<SatisfactionSurvey> viewSatisfactionSurveys() {
-
-        return null;
+    public void setVehicleMaintenance(ClientVehicle vehicle , MaintenanceStatus status) {
+        vehicle.getMaintenanceManager().setMaintenanceStatus(status);
     }
 
     public Invoice generateInvoiceForClient(ClientAccount client, ClientVehicle vehicle) {

@@ -2,24 +2,24 @@ package com.taller.sistema_taller.model.InvoiceGeneration;
 
 import com.taller.sistema_taller.model.UserAccounts.UserAccount;
 import com.taller.sistema_taller.model.VehicleManagement.ClientVehicle;
-import com.taller.sistema_taller.model.VehicleManagement.DiagnosisManager;
 import com.taller.sistema_taller.model.VehicleManagement.VehicleDiagnosis;
+
 import java.util.Date;
 import java.util.List;
 
 public class Invoice {
     private final UserAccount client;
     private final ClientVehicle vehicle;
-    private final DiagnosisManager diagnosisManager;
+    private final List<VehicleDiagnosis> authorizedDiagnoses;
     private final float total;
     private final Date generationDate;
 
-    public Invoice(UserAccount client, ClientVehicle vehicle, float total, Date generationDate) {
+    public Invoice(UserAccount client, ClientVehicle vehicle, List<VehicleDiagnosis> authorizedDiagnoses, float total) {
         this.client = client;
         this.vehicle = vehicle;
+        this.authorizedDiagnoses = authorizedDiagnoses;
         this.total = total;
-        this.generationDate = generationDate;
-        this.diagnosisManager = vehicle.getDiagnosisManager();
+        this.generationDate = new Date();
     }
 
     public UserAccount getClient() {
@@ -30,6 +30,10 @@ public class Invoice {
         return vehicle;
     }
 
+    public List<VehicleDiagnosis> getAuthorizedDiagnoses() {
+        return authorizedDiagnoses;
+    }
+
     public float getTotal() {
         return total;
     }
@@ -37,9 +41,4 @@ public class Invoice {
     public Date getGenerationDate() {
         return generationDate;
     }
-
-    public List<VehicleDiagnosis> getAuthorizedMaintenanceDiagnoses() {
-        return diagnosisManager.getAuthorizedDiagnoses();
-    }
-
 }

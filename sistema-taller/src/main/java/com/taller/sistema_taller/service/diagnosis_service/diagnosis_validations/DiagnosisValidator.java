@@ -10,23 +10,39 @@ import org.springframework.stereotype.Component;
 public class DiagnosisValidator {
 
     public void validateDiagnosisData(VehicleDiagnosisDTO diagnosisDto) {
-        if (diagnosisDto.getProblemDetail() == null || diagnosisDto.getProblemDetail().isEmpty()) {
+        validateProblemDetail(diagnosisDto.getProblemDetail());
+        validateMaintenanceCost(diagnosisDto.getMaintenanceCost());
+        validateEvaluationDate(diagnosisDto.getEvaluationDate());
+    }
+
+    public void validateDiagnosisExists(Long diagnosisId, DiagnosisManager diagnosisManager) {
+        if (!diagnosisExists(diagnosisId, diagnosisManager)) {
+            throw new DiagnosisNotFoundException("Diagnóstico con ID " + diagnosisId + " no encontrado.");
+        }
+    }
+
+    private void validateProblemDetail(String problemDetail) {
+        if (problemDetail == null || problemDetail.isEmpty()) {
             throw new InvalidDiagnosisDataException("El detalle del problema es obligatorio.");
         }
-        if (diagnosisDto.getMaintenanceCost() < 0) {
+    }
+
+    private void validateMaintenanceCost(float maintenanceCost) {
+        if (maintenanceCost < 0) {
             throw new InvalidDiagnosisDataException("El costo de mantenimiento no puede ser negativo.");
         }
-        if (diagnosisDto.getEvaluationDate() == null) {
+    }
+
+    private void validateEvaluationDate(Object evaluationDate) {
+        if (evaluationDate == null) {
             throw new InvalidDiagnosisDataException("La fecha de evaluación es obligatoria.");
         }
     }
 
-    public void validateDiagnosisExists(Long diagnosisId, DiagnosisManager diagnosisManager) {
-        boolean exists = diagnosisManager.getDiagnoses().stream()
+    private boolean diagnosisExists(Long diagnosisId, DiagnosisManager diagnosisManager) {
+        return diagnosisManager.getDiagnoses().stream()
                 .anyMatch(diagnosis -> diagnosis.getIdDiagnosis().equals(diagnosisId));
-        if (!exists) {
-            throw new DiagnosisNotFoundException("Diagnóstico con ID " + diagnosisId + " no encontrado.");
-        }
     }
 }
+
 

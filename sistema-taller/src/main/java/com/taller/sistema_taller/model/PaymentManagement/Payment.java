@@ -14,10 +14,6 @@ public class Payment {
         this.paymentDate = paymentDate;
     }
 
-    public void registerClientPayment(ClientAccount client, float amount) {
-
-    }
-
     public float calculateOutstandingBalance(ClientAccount client) {
         return 0.0f;
     }

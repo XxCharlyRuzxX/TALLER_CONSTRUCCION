@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface SatisfactionSurveyServiceInterface {
 
-    SatisfactionSurvey createSurvey(SatisfactionSurveyDTO surveyDTO);
+    SatisfactionSurvey registerSurvey(SatisfactionSurveyDTO surveyDTO);
 
     List<SatisfactionSurvey> getSurveysByClientId(Long clientId);
 }

@@ -1,7 +1,6 @@
 package com.taller.sistema_taller.service.survey_service;
 
 import com.taller.sistema_taller.dto.SatisfactionSurveyDTO;
-import com.taller.sistema_taller.exceptions.user_exceptions.UserNotFoundException;
 import com.taller.sistema_taller.model.SatisfactionSurveys.SatisfactionSurvey;
 import com.taller.sistema_taller.model.UserAccounts.ClientAccount;
 import com.taller.sistema_taller.repositories.SatisfactionSurveyRepository;
@@ -22,8 +21,7 @@ public class SatisfactionSurveyService implements SatisfactionSurveyServiceInter
     private final SatisfactionSurveyValidator validator;
 
     @Autowired
-    public SatisfactionSurveyService(
-            SatisfactionSurveyRepository surveyRepository,
+    public SatisfactionSurveyService(SatisfactionSurveyRepository surveyRepository,
             UserAccountRepository userAccountRepository,
             SatisfactionSurveyValidator validator) {
         this.surveyRepository = surveyRepository;
@@ -32,14 +30,9 @@ public class SatisfactionSurveyService implements SatisfactionSurveyServiceInter
     }
 
     @Override
-    public SatisfactionSurvey createSurvey(SatisfactionSurveyDTO surveyDTO) {
+    public SatisfactionSurvey registerSurvey(SatisfactionSurveyDTO surveyDTO) {
         validator.validateSurveyData(surveyDTO);
-
-        ClientAccount client = userAccountRepository.findById(surveyDTO.getClientId())
-                .filter(ClientAccount.class::isInstance)
-                .map(ClientAccount.class::cast)
-                .orElseThrow(() -> new UserNotFoundException(
-                        "No se encontró un cliente con ID " + surveyDTO.getClientId()));
+        ClientAccount client = validator.validateClientExists(surveyDTO.getClientId(), userAccountRepository);
 
         SatisfactionSurvey survey = new SatisfactionSurvey(
                 surveyDTO.getRating(),
@@ -51,12 +44,8 @@ public class SatisfactionSurveyService implements SatisfactionSurveyServiceInter
 
     @Override
     public List<SatisfactionSurvey> getSurveysByClientId(Long clientId) {
-        ClientAccount client = userAccountRepository.findById(clientId)
-                .filter(ClientAccount.class::isInstance)
-                .map(ClientAccount.class::cast)
-                .orElseThrow(() -> new UserNotFoundException(
-                        "No se encontró un cliente con ID " + clientId));
-
+        ClientAccount client = validator.validateClientExists(clientId, userAccountRepository);
         return surveyRepository.findByRespondent_UserId(client.getUserId());
     }
+
 }
