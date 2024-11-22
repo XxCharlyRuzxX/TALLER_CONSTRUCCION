@@ -36,6 +36,11 @@ const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
   const handleSave = async () => {
     setLoading(true);
     try {
+      if (!vehicleData.clientId) {
+        alert("Por favor, ingrese el ID del cliente.");
+        setLoading(false);
+        return;
+      }
       await registerVehicle(vehicleData);
       onVehicleAdded();
       onClose();
@@ -68,6 +73,19 @@ const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
             <Typography variant="h6" sx={{ mb: 3, textAlign: "center" }}>
               Agregar Vehículo
             </Typography>
+            <TextField
+              fullWidth
+              label="ID del Cliente"
+              type="number"
+              value={vehicleData.clientId}
+              onChange={(e) =>
+                setVehicleData({
+                  ...vehicleData,
+                  clientId: parseInt(e.target.value, 10),
+                })
+              }
+              sx={{ mb: 2 }}
+            />
             <TextField
               fullWidth
               label="Marca"

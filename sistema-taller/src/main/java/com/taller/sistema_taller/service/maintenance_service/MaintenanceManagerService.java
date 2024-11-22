@@ -136,9 +136,6 @@ public class MaintenanceManagerService implements MaintenanceManagerServiceInter
     private void updateMaintenanceAdvanceDetails(MaintenanceAdvance advance, MaintenanceAdvanceDTO dto) {
         advance.setDescription(dto.getDescription());
         advance.getImagesAdvance().clear();
-        if (dto.getImagesAdvance() != null) {
-            advance.getImagesAdvance().addAll(dto.getImagesAdvance());
-        }
     }
 
     private MaintenanceManagerDTO mapToMaintenanceManagerDTO(MaintenanceManager manager) {
@@ -156,7 +153,6 @@ public class MaintenanceManagerService implements MaintenanceManagerServiceInter
         dto.setIdMaintenanceAdvance(advance.getIdMaintenanceAdvance());
         dto.setDate(advance.getDate());
         dto.setDescription(advance.getDescription());
-        dto.setImagesAdvance(advance.getImagesAdvance());
         return dto;
     }
 }

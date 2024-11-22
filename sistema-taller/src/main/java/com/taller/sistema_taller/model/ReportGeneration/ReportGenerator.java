@@ -7,6 +7,8 @@ import com.itextpdf.text.pdf.PdfWriter;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+@Component
 public class ReportGenerator {
 
     public byte[] generatePDF(List<ReportSection> sections, ReportType reportType) {
