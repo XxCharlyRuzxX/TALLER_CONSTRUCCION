@@ -4,12 +4,13 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
 import com.taller.sistema_taller.model.InvoiceGeneration.InvoicePDFSectionBuilder;
+import com.taller.sistema_taller.model.UserAccounts.AccessCredentials;
 import com.taller.sistema_taller.model.UserAccounts.UserAccount;
 import com.taller.sistema_taller.model.VehicleManagement.ClientVehicle;
+import com.taller.sistema_taller.model.VehicleManagement.StaticVehicleData;
 import com.taller.sistema_taller.model.VehicleManagement.VehicleDiagnosis;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,7 +40,11 @@ public class InvoicePDFSectionBuilderTest {
     public void testAddClientDetails() throws DocumentException {
         UserAccount client = mock(UserAccount.class);
         when(client.getUserName()).thenReturn("John Doe");
-        when(client.getAccessCredentials().getEmail()).thenReturn("john.doe@example.com");
+        AccessCredentials accessCredentials = mock(AccessCredentials.class);
+        when(client.getAccessCredentials()).thenReturn(accessCredentials);
+        when(accessCredentials.getEmail()).thenReturn("john.doe@example.com");
+        when(client.getAccessCredentials()).thenReturn(accessCredentials);
+        when(accessCredentials.getEmail()).thenReturn("john.doe@example.com");
 
         invoicePDFSectionBuilder.addClientDetails(document, client);
         verify(document, times(4)).add(any(Paragraph.class));
@@ -49,7 +54,11 @@ public class InvoicePDFSectionBuilderTest {
     public void testAddVehicleDetails() throws DocumentException {
         ClientVehicle vehicle = mock(ClientVehicle.class);
         when(vehicle.getIdVehicle()).thenReturn("12345");
-        when(vehicle.getStaticVehicleData().getModel()).thenReturn("Toyota Corolla");
+        StaticVehicleData staticVehicleData = mock(StaticVehicleData.class);
+        when(vehicle.getStaticVehicleData()).thenReturn(staticVehicleData);
+        when(staticVehicleData.getModel()).thenReturn("Toyota Corolla");
+        when(vehicle.getStaticVehicleData()).thenReturn(staticVehicleData);
+        when(staticVehicleData.getModel()).thenReturn("Toyota Corolla");
 
         invoicePDFSectionBuilder.addVehicleDetails(document, vehicle);
         verify(document, times(4)).add(any(Paragraph.class));
