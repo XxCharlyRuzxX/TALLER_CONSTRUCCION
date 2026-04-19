@@ -59,7 +59,7 @@ const CarTable: React.FC<CarTableProps> = ({
             <tr>
               <th className="px-4 py-3 text-left font-semibold">Vehiculo</th>
               <th className="px-4 py-3 text-left font-semibold">Placa</th>
-              <th className="px-4 py-3 text-left font-semibold">Ano</th>
+              <th className="px-4 py-3 text-left font-semibold">Año</th>
               <th className="px-4 py-3 text-left font-semibold">Kilometraje</th>
               <th className="px-4 py-3 text-left font-semibold">Combustible</th>
               <th className="px-4 py-3 text-left font-semibold">Diagnosticos</th>
