@@ -109,7 +109,7 @@ const DiagnosisVehicleSection: React.FC<DiagnosisVehicleSectionProps> = ({
         ) : (
           <>
             <div className="overflow-x-auto rounded-lg border">
-              <table className="w-full min-w-[680px] text-left">
+              <table className="w-full min-w-170 text-left">
                 <thead className="bg-muted/60 text-muted-foreground text-xs uppercase tracking-wider">
                   <tr>
                     <th className="px-3 py-2 font-semibold">Problema</th>

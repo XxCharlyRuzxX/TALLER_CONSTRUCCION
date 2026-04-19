@@ -47,7 +47,7 @@ const MaintenanceVehicleSection: React.FC<MaintenanceVehicleSectionProps> = ({
       <CardContent className="p-4 sm:p-6">
         {progresses.length > 0 ? (
           <div className="overflow-x-auto rounded-lg border">
-            <table className="w-full min-w-[640px]">
+            <table className="w-full min-w-160">
               <thead className="bg-muted/60 text-muted-foreground text-xs uppercase tracking-wider">
                 <tr>
                   <th className="px-3 py-2 text-left font-semibold">Fecha</th>
