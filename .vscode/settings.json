@@ -1,17 +1,4 @@
 {
-  "java.configuration.updateBuildConfiguration": "interactive",
-  "java.jdt.ls.java.home": "D:\\Java\\jdk25",
-  "java.configuration.runtimes": [
-    {
-      "name": "JavaSE-25",
-      "path": "D:\\Java\\jdk25",
-      "default": true
-    }
-  ],
-  "terminal.integrated.env.windows": {
-    "JAVA_HOME": "D:\\Java\\jdk25",
-    "Path": "D:\\Java\\jdk25\\bin;${env:Path}"
-  },
   "sonarlint.connectedMode.project": {
     "connectionId": "xxcharlyruzxx",
     "projectKey": "XxCharlyRuzxX_TALLER_CONSTRUCCION"
