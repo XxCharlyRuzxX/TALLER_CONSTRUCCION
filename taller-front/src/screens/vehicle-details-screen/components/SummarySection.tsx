@@ -1,9 +1,7 @@
 import React from "react";
-import { Paper, Typography, Button, Box } from "@mui/material";
-import Colors from "../../../utils/Colors";
-import DescriptionIcon from "@mui/icons-material/Description";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import HelpIcon from "@mui/icons-material/Help";
+import { Download, HelpCircle, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface SummarySectionProps {
   totalToPay: number;
@@ -19,82 +17,36 @@ const SummarySection: React.FC<SummarySectionProps> = ({
   onCustomerSupport,
 }) => {
   return (
-    <Paper
-      sx={{
-        padding: 3,
-        backgroundColor: Colors.PrimaryGray,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-      }}
-    >      <Box>
-        <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-          Total a pagar:
-        </Typography>
-        <Typography
-          variant="h4"
-          sx={{
-            color: Colors.HighlightGreen,
-          }}
-        >
-          ${totalToPay.toFixed(2)}
-        </Typography>
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          gap: 2,
-        }}
-      >
-        <Button
-          variant="contained"
-          startIcon={<DescriptionIcon />}
-          onClick={onRequestReport}
-          sx={{
-            backgroundColor: Colors.HighlightBlue,
-            color: Colors.White,
-            "&:hover": {
-              backgroundColor: Colors.DarkBlue,
-            },
-            minWidth: "350px",
-          }}
-        >
-          Descargar Reporte General
-        </Button>
+    <Card className="h-full py-0">
+      <CardHeader className="border-b py-5">
+        <CardTitle>Resumen general</CardTitle>
+        <CardDescription>Incluye diagnosticos autorizados y mantenimiento.</CardDescription>
+      </CardHeader>
 
-        <Button
-          variant="contained"
-          startIcon={<ThumbUpIcon />}
-          onClick={onSubmitSurvey}
-          sx={{
-            backgroundColor: Colors.HighlightBlue,
-            color: Colors.White,
-            "&:hover": {
-              backgroundColor: Colors.DarkBlue,
-            },
-            minWidth: "300px",
-          }}
-        >
-          Realizar Encuesta de Satisfacción
-        </Button>
+      <CardContent className="space-y-4 p-5">
+        <div>
+          <p className="text-muted-foreground text-sm">Total a pagar</p>
+          <p className="text-3xl font-semibold tracking-tight">${totalToPay.toFixed(2)} MXN</p>
+        </div>
 
-        <Button
-          variant="contained"
-          startIcon={<HelpIcon />}
-          onClick={onCustomerSupport}
-          sx={{
-            backgroundColor: Colors.HighlightBlue,
-            color: Colors.White,
-            "&:hover": {
-              backgroundColor: Colors.DarkBlue,
-            },
-            minWidth: "300px",
-          }}
-        >
-          Ayuda al Cliente
-        </Button>
-      </Box>
-    </Paper>
+        <div className="space-y-2">
+          <Button type="button" className="w-full justify-start" onClick={onRequestReport}>
+            <Download className="h-4 w-4" />
+            Descargar reporte general
+          </Button>
+
+          <Button type="button" variant="outline" className="w-full justify-start" onClick={onSubmitSurvey}>
+            <Star className="h-4 w-4" />
+            Realizar encuesta de satisfaccion
+          </Button>
+
+          <Button type="button" variant="outline" className="w-full justify-start" onClick={onCustomerSupport}>
+            <HelpCircle className="h-4 w-4" />
+            Ayuda al cliente
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

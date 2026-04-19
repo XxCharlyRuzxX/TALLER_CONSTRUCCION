@@ -1,17 +1,6 @@
 import React from "react";
-import {
-  Paper,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Typography,
-  Box,
-} from "@mui/material";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import HourglassTopIcon from "@mui/icons-material/HourglassTop";
-import PendingIcon from "@mui/icons-material/Pending";
+import { CheckCircle2, Clock3, AlertTriangle } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MaintenanceAdvance } from "../../../interfaces/MaintenanceAdvance";
 import Colors from "../../../utils/Colors";
 import { MaintenanceStatus } from "../../../interfaces/MaintenanceManager";
@@ -25,21 +14,17 @@ const STATUS_MAP = {
   [MaintenanceStatus.COMPLETED]: {
     color: Colors.HighlightGreen,
     label: "Completado",
-    icon: (
-      <CheckCircleIcon sx={{ color: Colors.HighlightGreen, fontSize: 25 }} />
-    ),
+    icon: <CheckCircle2 className="h-4 w-4" />,
   },
   [MaintenanceStatus.IN_PROGRESS]: {
     color: Colors.HighlightOrange,
-    label: "En Progreso",
-    icon: (
-      <HourglassTopIcon sx={{ color: Colors.HighlightOrange, fontSize: 22 }} />
-    ),
+    label: "En proceso",
+    icon: <Clock3 className="h-4 w-4" />,
   },
   [MaintenanceStatus.PENDING]: {
     color: Colors.HighlightRed,
-    label: "No Iniciado",
-    icon: <PendingIcon sx={{ color: Colors.HighlightRed, fontSize: 22 }} />,
+    label: "No iniciado",
+    icon: <AlertTriangle className="h-4 w-4" />,
   },
 };
 
@@ -50,89 +35,57 @@ const MaintenanceVehicleSection: React.FC<MaintenanceVehicleSectionProps> = ({
   const { color, label, icon } = STATUS_MAP[maintenanceStatus];
 
   return (
-    <Paper sx={{ padding: 3, backgroundColor: Colors.PrimaryGray }}>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          borderRadius: 2,
-          marginBottom: 2,
-          gap: 2,
-        }}
-      >
-        {icon}
-        <Typography
-          sx={{
-            color: color,
-            fontSize: 22,
-          }}
-        >
-          {label}
-        </Typography>
-      </Box>
+    <Card className="py-0">
+      <CardHeader className="border-b py-5">
+        <div className="flex items-center gap-2" style={{ color }}>
+          {icon}
+          <CardTitle>Mantenimiento</CardTitle>
+        </div>
+        <CardDescription>Estado actual: {label}</CardDescription>
+      </CardHeader>
 
-      {progresses.length > 0 ? (
-        <Table
-          sx={{
-            "& td, & th": {
-              textAlign: "center",
-              padding: "8px",
-            },
-            "& th": {
-              backgroundColor: Colors.HighlightGray,
-              color: Colors.White,
-            },
-            "& td": {
-              border: "none",
-            },
-            backgroundColor: Colors.White,
-          }}
-        >
-          <TableHead>
-            <TableRow>
-              <TableCell>
-                <b>Fecha</b>
-              </TableCell>
-              <TableCell>
-                <b>Descripción</b>
-              </TableCell>
-              <TableCell>
-                <b>Imágenes</b>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {progresses.map((maintenanceAdvance) => (
-              <TableRow key={maintenanceAdvance.idMaintenanceAdvance}>
-                <TableCell>
-                  {new Date(maintenanceAdvance.date).toLocaleDateString()}
-                </TableCell>
-                <TableCell>{maintenanceAdvance.description}</TableCell>
-                <TableCell>
-                  {maintenanceAdvance.imagesAdvance &&
-                  maintenanceAdvance.imagesAdvance.length > 0 ? (
-                    maintenanceAdvance.imagesAdvance.map((image, idx) => (
-                      <img
-                        key={idx}
-                        src={image}
-                        alt="Avance"
-                        style={{ width: 50, height: 50, marginRight: 5 }}
-                      />
-                    ))
-                  ) : ("Imágenes del mantenimiento no disponibles"
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      ) : (
-        <Typography
-        >
-          No hay avances de mantenimiento registrados.
-        </Typography>
-      )}
-    </Paper>
+      <CardContent className="p-4 sm:p-6">
+        {progresses.length > 0 ? (
+          <div className="overflow-x-auto rounded-lg border">
+            <table className="w-full min-w-[640px]">
+              <thead className="bg-muted/60 text-muted-foreground text-xs uppercase tracking-wider">
+                <tr>
+                  <th className="px-3 py-2 text-left font-semibold">Fecha</th>
+                  <th className="px-3 py-2 text-left font-semibold">Descripcion</th>
+                  <th className="px-3 py-2 text-left font-semibold">Imagenes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {progresses.map((maintenanceAdvance) => (
+                  <tr key={maintenanceAdvance.idMaintenanceAdvance} className="border-t align-top">
+                    <td className="px-3 py-3 text-sm">{new Date(maintenanceAdvance.date).toLocaleDateString()}</td>
+                    <td className="px-3 py-3 text-sm">{maintenanceAdvance.description}</td>
+                    <td className="px-3 py-3">
+                      {maintenanceAdvance.imagesAdvance && maintenanceAdvance.imagesAdvance.length > 0 ? (
+                        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                          {maintenanceAdvance.imagesAdvance.map((image, idx) => (
+                            <img
+                              key={idx}
+                              src={image}
+                              alt="Avance"
+                              className="h-14 w-14 rounded-md border object-cover"
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-muted-foreground text-xs">Imagenes del mantenimiento no disponibles</p>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-muted-foreground text-sm">No hay avances de mantenimiento registrados.</p>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
