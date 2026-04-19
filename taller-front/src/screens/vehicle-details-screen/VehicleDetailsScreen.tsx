@@ -245,12 +245,14 @@ const VehicleDetailsScreen: React.FC = () => {
             />
           </div>
 
-          <SummarySection
-            totalToPay={totalCost}
-            onRequestReport={handleRequestReport}
-            onSubmitSurvey={handleOpenSurveyModal}
-            onCustomerSupport={() => toast.info("Pronto habilitaremos soporte al cliente.")}
-          />
+          <div className="self-start">
+            <SummarySection
+              totalToPay={totalCost}
+              onRequestReport={handleRequestReport}
+              onSubmitSurvey={handleOpenSurveyModal}
+              onCustomerSupport={() => toast.info("Pronto habilitaremos soporte al cliente.")}
+            />
+          </div>
         </div>
 
         <SurveyModal

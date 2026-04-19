@@ -17,7 +17,7 @@ const SummarySection: React.FC<SummarySectionProps> = ({
   onCustomerSupport,
 }) => {
   return (
-    <Card className="h-full py-0">
+    <Card className="py-0">
       <CardHeader className="border-b py-5">
         <CardTitle>Resumen general</CardTitle>
         <CardDescription>Incluye diagnosticos autorizados y mantenimiento.</CardDescription>
