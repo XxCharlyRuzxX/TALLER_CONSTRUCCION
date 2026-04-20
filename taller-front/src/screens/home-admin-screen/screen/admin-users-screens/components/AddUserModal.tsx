@@ -14,7 +14,7 @@ interface RegisterUserModalProps {
 const RegisterUserModal: React.FC<RegisterUserModalProps> = ({ open, onClose, onUserRegistered }) => {
   const [registrationData, setRegistrationData] = useState<RegisterDTO>({
     userName: "",
-    phone: 0,
+    phone: "",
     email: "",
     password: "",
   });
@@ -64,7 +64,7 @@ const RegisterUserModal: React.FC<RegisterUserModalProps> = ({ open, onClose, on
           onChange={handleChange}
           fullWidth
           sx={{ mb: 2 }}
-          type="number"
+          type="tel"
         />
         <TextField
           label="Email"
