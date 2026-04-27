@@ -1,20 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Typography, Avatar, CircularProgress } from "@mui/material";
-import { PageItemPaper } from "../../components/PageItemPaper";
-import { Colors } from "../../utils/Colors";
+import { Card, CardContent } from "@/components/ui/card";
+import { User } from "lucide-react";
 import { UserAccount } from "../../interfaces/UserAccount";
 import { ClientVehicle } from "../../interfaces/ClientVehicle";
 import ExpandableTableCard from "./components/ExpandedTableCar";
 import RegisterVehicleModal from "./components/RegisterVehicleModal";
 import { loadClientVehicles, updateClientVehicles } from "./functions/userHomeFunctions";
+import UserHomeStats from "./components/UserHomeStats";
+import UserHomeHeader from "./components/UserHomeHeader";
+
+const CLIENT_THEME_KEY = "client-user-theme";
 
 const UserHomePage: React.FC = () => {
   const [user, setUser] = useState<UserAccount | null>(null);
   const [vehicles, setVehicles] = useState<ClientVehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    return localStorage.getItem(CLIENT_THEME_KEY) === "dark";
+  });
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", darkMode);
+    localStorage.setItem(CLIENT_THEME_KEY, darkMode ? "dark" : "light");
+
+    return () => {
+      document.documentElement.classList.remove("dark");
+    };
+  }, [darkMode]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -54,42 +70,50 @@ const UserHomePage: React.FC = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", backgroundColor: "#F5F1F1" }}>
-        <CircularProgress />
-      </Box>
+      <main className="bg-background text-foreground flex min-h-screen items-center justify-center">
+        <p className="text-muted-foreground text-sm">Cargando vehiculos...</p>
+      </main>
     );
   }
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", minHeight: "100vh", backgroundColor: "#F5F1F1" }}>
-      <Box sx={{ width: "100%", height: 100, backgroundColor: Colors.HighlightGray, display: "flex", alignItems: "center", justifyContent: "center", gap: 2 }}>
-        <Typography variant="h5" sx={{ color: Colors.White }}>
-          BIENVENIDO A MI TALLER
-        </Typography>
-        <img src="/taller.svg" alt="taller" style={{ width: "5vh" }} />
-      </Box>
+    <main className="bg-background text-foreground min-h-screen px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl space-y-6">
+        <UserHomeHeader
+          user={user}
+          darkMode={darkMode}
+          onToggleTheme={() => setDarkMode((previous) => !previous)}
+        />
 
-      <PageItemPaper sx={{ width: "80%", mt: 4, minHeight: "400px" }}>
-        <Box display="flex" alignItems="center">
-          <Avatar sx={{ width: 56, height: 56, backgroundColor: Colors.HighlightBlue }}>
-            {user.userName.charAt(0)}
-          </Avatar>
-          <Box ml={2}>
-            <Typography variant="h6">{user.userName}</Typography>
-            <Typography variant="body2" color="textSecondary">{user.accessCredentials.email}</Typography>
-          </Box>
-        </Box>
-        <Box sx={{ paddingTop: 2 }}>
-          <ExpandableTableCard cars={vehicles} title="Mis Vehículos" onAddCar={handleAddCar} />
-        </Box>
-      </PageItemPaper>
+        <Card className="py-0">
+          <CardContent className="flex items-center gap-3 p-5">
+            <span className="inline-flex rounded-full border p-3">
+              <User className="h-4 w-4" />
+            </span>
+            <div>
+              <p className="font-semibold leading-tight">{user.userName}</p>
+              <p className="text-muted-foreground text-sm">{user.accessCredentials.email}</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <UserHomeStats vehicles={vehicles} darkMode={darkMode} />
+
+        <ExpandableTableCard
+          cars={vehicles}
+          title="Mis vehiculos"
+          onAddCar={handleAddCar}
+          darkMode={darkMode}
+        />
+      </div>
+
       <RegisterVehicleModal
         userAccount={user}
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveVehicle}
       />
-    </Box>
+    </main>
   );
 };
 

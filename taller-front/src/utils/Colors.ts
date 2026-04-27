@@ -9,6 +9,38 @@ export const Colors = {
   HighlightYellow: '#FFEB3B',
   HighlightBlue: '#2196F3',
   DarkBlue: '#1976D2',
+  MaintenanceStatusPalette: {
+    PENDING: {
+      lightBg: '#FFF3E0',
+      lightText: '#9A3412',
+      lightBorder: '#FDBA74',
+      lightDot: '#EA580C',
+      darkBg: '#7C2D12',
+      darkText: '#FED7AA',
+      darkBorder: '#C2410C',
+      darkDot: '#FB923C',
+    },
+    IN_PROGRESS: {
+      lightBg: '#E3F2FD',
+      lightText: '#0C4A6E',
+      lightBorder: '#7DD3FC',
+      lightDot: '#0284C7',
+      darkBg: '#0C4A6E',
+      darkText: '#BAE6FD',
+      darkBorder: '#0369A1',
+      darkDot: '#38BDF8',
+    },
+    COMPLETED: {
+      lightBg: '#E8F5E9',
+      lightText: '#166534',
+      lightBorder: '#86EFAC',
+      lightDot: '#16A34A',
+      darkBg: '#14532D',
+      darkText: '#BBF7D0',
+      darkBorder: '#15803D',
+      darkDot: '#4ADE80',
+    },
+  },
 }
 
 export default Colors;

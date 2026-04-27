@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Box, Typography, Alert, CircularProgress } from "@mui/material";
-import Colors from "../../utils/Colors";
+import { ArrowLeft, Wrench } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import SummarySection from "./components/SummarySection";
 import GeneralVehicleData from "./components/GeneralVehicleData";
 import DiagnosisVehicleSection from "./components/DiagnosisVehicleSection";
 import MaintenanceVehicleSection from "./components/MaintenanceVehicleSection";
-import { PageItemPaper } from "../../components/PageItemPaper";
 import { VehicleDiagnosis } from "../../interfaces/VehicleDiagnosis";
 import { updateMaintenanceStatus } from "../../services/maintenanceService";
 import { MaintenanceStatus } from "../../interfaces/MaintenanceManager";
@@ -18,6 +17,10 @@ import { calculateAuthorizedCost, calculateTotalCost, updateDiagnosis } from "..
 import { generateReport } from "../../services/reportService";
 import { ReportType } from "../../services/interfaces/ReportInterfaces";
 import { ClientVehicle } from "../../interfaces/ClientVehicle";
+import { toast } from "sonner";
+import ClientThemeToggle from "../user-home-screen/components/ClientThemeToggle";
+
+const CLIENT_THEME_KEY = "client-user-theme";
 
 const VehicleDetailsScreen: React.FC = () => {
   const { idVehicle } = useParams<{ idVehicle: string }>();
@@ -30,13 +33,25 @@ const VehicleDetailsScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    return localStorage.getItem(CLIENT_THEME_KEY) === "dark";
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", darkMode);
+    localStorage.setItem(CLIENT_THEME_KEY, darkMode ? "dark" : "light");
+
+    return () => {
+      document.documentElement.classList.remove("dark");
+    };
+  }, [darkMode]);
 
   const handleOpenSurveyModal = () => setIsSurveyModalOpen(true);
   const handleCloseSurveyModal = () => setIsSurveyModalOpen(false);
 
   const handleSubmitSurvey = async (rating: number | null, feedback: string) => {
     if (!rating || !vehicle) {
-      alert("Por favor, selecciona una calificación y asegúrate de que los datos del vehículo estén cargados.");
+      toast.warning("Por favor, selecciona una calificacion y asegurese de que los datos del vehiculo esten cargados.");
       return;
     }
     try {
@@ -46,11 +61,11 @@ const VehicleDetailsScreen: React.FC = () => {
         clientId: vehicle.clientId,
       });
 
-      alert("¡Gracias por tu retroalimentación!");
+      toast.success("Gracias por tu retroalimentacion.");
       handleCloseSurveyModal();
     } catch (error) {
       console.error("Error al enviar la encuesta:", error);
-      alert("Hubo un problema al enviar la encuesta. Intenta nuevamente.");
+      toast.error("Hubo un problema al enviar la encuesta. Intenta nuevamente.");
     }
   };
 
@@ -123,7 +138,7 @@ const VehicleDetailsScreen: React.FC = () => {
         );
       }
       await _initializeData();
-      alert("Diagnósticos autorizados exitosamente.");
+      toast.success("Diagnosticos autorizados exitosamente.");
     } catch (error) {
       console.error("Error al autorizar diagnósticos:", error);
       setError("Error al autorizar diagnósticos. Intenta nuevamente.");
@@ -137,7 +152,7 @@ const VehicleDetailsScreen: React.FC = () => {
         MaintenanceStatus.IN_PROGRESS
       );
       await _initializeData();
-      alert("El proceso de mantenimiento ha comenzado.");
+      toast.success("El proceso de mantenimiento ha comenzado.");
       setMaintenanceStatus(MaintenanceStatus.IN_PROGRESS);
     } catch (error) {
       console.error("Error al iniciar el mantenimiento:", error);
@@ -147,7 +162,7 @@ const VehicleDetailsScreen: React.FC = () => {
 
   const handleRequestReport = async () => {
     if (!idVehicle) {
-      alert("El ID del vehículo no está disponible.");
+      toast.error("El ID del vehiculo no esta disponible.");
       return;
     }
     try {
@@ -155,9 +170,15 @@ const VehicleDetailsScreen: React.FC = () => {
       downloadFile(pdfBlob, `Reporte_Vehiculo_${idVehicle}.pdf`);
     } catch (error) {
       console.error("Error al generar el reporte:", error);
-      alert("No se pudo generar el reporte. Intenta nuevamente.");
+      toast.error("No se pudo generar el reporte. Intenta nuevamente.");
     }
   };
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
 
   useEffect(() => {
     _initializeData();
@@ -165,95 +186,82 @@ const VehicleDetailsScreen: React.FC = () => {
 
   if (loading) {
     return (
-      <Box
-        sx={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <CircularProgress />
-      </Box>
+      <main className="bg-background text-foreground flex min-h-screen items-center justify-center">
+        <p className="text-muted-foreground text-sm">Cargando detalles del vehiculo...</p>
+      </main>
     );
   }
 
   if (error) {
-    return <Alert severity="error">{error}</Alert>;
+    return (
+      <main className="bg-background text-foreground flex min-h-screen items-center justify-center px-6">
+        <div className="space-y-3 text-center">
+          <p className="text-destructive text-sm font-medium">{error}</p>
+          <Button type="button" variant="outline" onClick={_initializeData}>
+            Reintentar
+          </Button>
+        </div>
+      </main>
+    );
   }
 
   return (
-    <PageItemPaper>
-      <Box
-        sx={{
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          gap: 4,
-        }}
-      >
-        <Box
-          sx={{
-            width: "100%",
-            height: 100,
-            backgroundColor: Colors.HighlightGray,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Typography variant="h5" sx={{ color: "white" }}>
-            Detalles del Vehículo
-          </Typography>
-        </Box>
+    <main className="bg-background text-foreground min-h-screen px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl space-y-6">
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b pb-3">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex rounded-lg border p-2">
+              <Wrench className="h-4 w-4" />
+            </span>
+            <div>
+              <p className="text-muted-foreground text-xs uppercase tracking-wider">Portal del cliente</p>
+              <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Detalle del vehiculo</h1>
+            </div>
+          </div>
 
-        <Box>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Datos Generales
-          </Typography>
-          <GeneralVehicleData vehicle={vehicle!} />
-        </Box>
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="outline" onClick={() => navigate("/userHome")}>
+              <ArrowLeft className="h-4 w-4" />
+              Volver
+            </Button>
+            <ClientThemeToggle darkMode={darkMode} onToggle={() => setDarkMode((prev) => !prev)} />
+          </div>
+        </header>
 
-        <Box>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Diagnósticos
-          </Typography>
-          <DiagnosisVehicleSection
-            diagnoses={diagnoses}
-            maintenanceStatus={maintenanceStatus}
-            onAuthorize={handleAuthorizeDiagnoses}
-            onStartMaintenance={handleStartMaintenance}
-          />
-        </Box>
+        <GeneralVehicleData vehicle={vehicle!} maintenanceStatus={maintenanceStatus} darkMode={darkMode} />
 
-        <Box>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Mantenimiento
-          </Typography>
-          <MaintenanceVehicleSection
-            progresses={vehicle!.maintenanceManager.maintenanceProgresses}
-            maintenanceStatus={maintenanceStatus}
-          />
-        </Box>
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
+            <DiagnosisVehicleSection
+              diagnoses={diagnoses}
+              maintenanceStatus={maintenanceStatus}
+              onAuthorize={handleAuthorizeDiagnoses}
+              onStartMaintenance={handleStartMaintenance}
+            />
 
-        <Box>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Resumen General
-          </Typography>
-          <SummarySection
-            totalToPay={totalCost}
-            onRequestReport={handleRequestReport}
-            onSubmitSurvey={handleOpenSurveyModal}
-            onCustomerSupport={() => console.log("Soporte al cliente")}
-          />
-          <SurveyModal
-            open={isSurveyModalOpen}
-            onClose={handleCloseSurveyModal}
-            onSubmit={handleSubmitSurvey}
-          />
-        </Box>
-      </Box>
-    </PageItemPaper>
+            <MaintenanceVehicleSection
+              progresses={vehicle!.maintenanceManager.maintenanceProgresses}
+              maintenanceStatus={maintenanceStatus}
+            />
+          </div>
+
+          <div className="self-start">
+            <SummarySection
+              totalToPay={totalCost}
+              onRequestReport={handleRequestReport}
+              onSubmitSurvey={handleOpenSurveyModal}
+              onCustomerSupport={() => toast.info("Pronto habilitaremos soporte al cliente.")}
+            />
+          </div>
+        </div>
+
+        <SurveyModal
+          open={isSurveyModalOpen}
+          onClose={handleCloseSurveyModal}
+          onSubmit={handleSubmitSurvey}
+        />
+      </div>
+    </main>
   );
 };
 

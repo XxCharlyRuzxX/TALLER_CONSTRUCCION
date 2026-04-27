@@ -1,9 +1,13 @@
 import React, { useState } from "react";
-import { Modal, Box, Typography, TextField, Button, Alert } from "@mui/material";
-import Colors from "../../../utils/Colors";
+import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { UserAccount } from "../../../interfaces/UserAccount";
 import { registerNewVehicle } from "../functions/vehicleFunctions";
 import { ClientVehicleDTO } from "../../../services/interfaces/VehicleInterfaces";
+import { toast } from "sonner";
 
 interface RegisterVehicleModalProps {
   userAccount: UserAccount;
@@ -25,7 +29,7 @@ const RegisterVehicleModal: React.FC<RegisterVehicleModalProps> = ({ userAccount
   };
 
   const [vehicleData, setVehicleData] = useState<ClientVehicleDTO>(initialVehicleData);
-  const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -37,38 +41,128 @@ const RegisterVehicleModal: React.FC<RegisterVehicleModalProps> = ({ userAccount
   };
 
   const handleSave = async () => {
+    setIsSaving(true);
     try {
-      setError(null);
       await registerNewVehicle(vehicleData);
       setVehicleData(initialVehicleData);
+      toast.success("Vehiculo registrado correctamente.");
       onSave();
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || "Error al registrar el vehículo");
+      toast.error(err.response?.data?.message || "Error al registrar el vehiculo");
+    } finally {
+      setIsSaving(false);
     }
   };
 
+  if (!open) {
+    return null;
+  }
+
   return (
-    <Modal open={open} onClose={onClose}>
-      <Box sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 600, bgcolor: "background.paper", borderRadius: 2, boxShadow: 24, p: 3, overflowY: "auto" }}>
-        <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>Registrar Nuevo Vehículo</Typography>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <Card className="relative z-10 max-h-[90vh] w-full max-w-2xl overflow-auto py-0">
+        <CardHeader className="flex flex-row items-start justify-between gap-3 border-b py-5">
+          <div>
+            <CardTitle>Registrar nuevo vehiculo</CardTitle>
+            <CardDescription>Completa la informacion para agregarlo a tu cuenta.</CardDescription>
+          </div>
+          <Button type="button" variant="ghost" size="icon" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </Button>
+        </CardHeader>
 
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        <CardContent className="p-6">
+          <FieldGroup className="grid gap-4 sm:grid-cols-2">
+            <Field>
+              <FieldLabel htmlFor="brand">Marca</FieldLabel>
+              <Input id="brand" name="brand" value={vehicleData.brand} onChange={handleChange} placeholder="Toyota" />
+            </Field>
 
-        <TextField label="Marca" name="brand" value={vehicleData.brand} onChange={handleChange} fullWidth margin="normal" />
-        <TextField label="Modelo" name="model" value={vehicleData.model} onChange={handleChange} fullWidth margin="normal" />
-        <TextField label="Año" name="year" value={vehicleData.year || ""} onChange={handleChange} fullWidth margin="normal" type="number" />
-        <TextField label="Placa" name="licensePlate" value={vehicleData.licensePlate} onChange={handleChange} fullWidth margin="normal" />
-        <TextField label="Kilometraje" name="mileage" value={vehicleData.mileage || ""} onChange={handleChange} fullWidth margin="normal" type="number" />
-        <TextField label="Nivel de Combustible (%)" name="fuelLevel" value={vehicleData.fuelLevel || ""} onChange={handleChange} fullWidth margin="normal" type="number" />
-        <TextField label="Observaciones Adicionales" name="additionalObservations" value={vehicleData.additionalObservations} onChange={handleChange} fullWidth margin="normal" multiline rows={3} />
+            <Field>
+              <FieldLabel htmlFor="model">Modelo</FieldLabel>
+              <Input id="model" name="model" value={vehicleData.model} onChange={handleChange} placeholder="Corolla" />
+            </Field>
 
-        <Box sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}>
-          <Button variant="contained" onClick={onClose} sx={{ bgcolor: Colors.HighlightRed }}>Cancelar</Button>
-          <Button variant="contained" sx={{ bgcolor: Colors.HighlightGreen }} onClick={handleSave}>Guardar</Button>
-        </Box>
-      </Box>
-    </Modal>
+            <Field>
+              <FieldLabel htmlFor="year">Año</FieldLabel>
+              <Input
+                id="year"
+                type="number"
+                name="year"
+                value={vehicleData.year || ""}
+                onChange={handleChange}
+                placeholder="2023"
+              />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="licensePlate">Placa</FieldLabel>
+              <Input
+                id="licensePlate"
+                name="licensePlate"
+                value={vehicleData.licensePlate}
+                onChange={handleChange}
+                placeholder="ABC-123"
+              />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="mileage">Kilometraje</FieldLabel>
+              <Input
+                id="mileage"
+                type="number"
+                name="mileage"
+                value={vehicleData.mileage || ""}
+                onChange={handleChange}
+                placeholder="48000"
+              />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="fuelLevel">Nivel de combustible (%)</FieldLabel>
+              <Input
+                id="fuelLevel"
+                type="number"
+                min={0}
+                max={100}
+                name="fuelLevel"
+                value={vehicleData.fuelLevel || ""}
+                onChange={handleChange}
+                placeholder="50"
+              />
+            </Field>
+
+            <Field className="sm:col-span-2">
+              <FieldLabel htmlFor="additionalObservations">Observaciones adicionales</FieldLabel>
+              <textarea
+                id="additionalObservations"
+                name="additionalObservations"
+                value={vehicleData.additionalObservations}
+                onChange={(event) =>
+                  setVehicleData((prev) => ({
+                    ...prev,
+                    additionalObservations: event.target.value,
+                  }))
+                }
+                className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring min-h-24 w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
+                placeholder="Ej. Presenta vibracion al frenar"
+              />
+            </Field>
+          </FieldGroup>
+
+          <div className="mt-6 flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancelar
+            </Button>
+            <Button type="button" onClick={handleSave} disabled={isSaving}>
+              {isSaving ? "Guardando..." : "Guardar"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
