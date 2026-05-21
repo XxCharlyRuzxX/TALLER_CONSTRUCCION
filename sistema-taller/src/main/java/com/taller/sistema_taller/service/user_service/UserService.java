@@ -23,6 +23,7 @@ public class UserService implements UserServiceInterface {
     private final UserAccountRepository userAccountRepository;
     private final UserValidator userValidator;
 
+    @Autowired
     public UserService(UserAccountRepository userAccountRepository, UserValidator userValidator) {
         this.userAccountRepository = userAccountRepository;
         this.userValidator = userValidator;
@@ -37,16 +38,13 @@ public class UserService implements UserServiceInterface {
     }
 
     @Override
-@Transactional
-public UserAccount updateUser(Long id, UserDTO userDto) {
-    UserAccount existingUser = findUserById(id);
-    if (!existingUser.getAccessCredentials().getEmail().equalsIgnoreCase(userDto.getEmail())) {
-        userValidator.validateEmailIsUniqueExcludingSelf(userDto.getEmail(), id);
+    @Transactional
+    public UserAccount updateUser(Long id, UserDTO userDto) {
+        UserAccount existingUser = findUserById(id);
+        userValidator.validateUserData(userDto);
+        updateUserAccountDetails(existingUser, userDto);
+        return userAccountRepository.save(existingUser);
     }
-    userValidator.validateUserData(userDto);
-    updateUserAccountDetails(existingUser, userDto);
-    return userAccountRepository.save(existingUser);
-}
 
     @Override
     @Transactional
