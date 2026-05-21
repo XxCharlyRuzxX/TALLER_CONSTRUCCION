@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -26,14 +27,14 @@ class UserServiceEmailUpdateRegressionTest {
 
     private UserValidator userValidator;
     private UserService userService;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setUp() {
         userValidator = new UserValidator(userAccountRepository);
-        userService = new UserService(userAccountRepository, userValidator);
+        userService = new UserService(userAccountRepository, userValidator , passwordEncoder);
     }
-
-    // ¡BORRA ESTA LÍNEA!
 
     @Test
     void updateUserWithSameEmailShouldSucceed() {
