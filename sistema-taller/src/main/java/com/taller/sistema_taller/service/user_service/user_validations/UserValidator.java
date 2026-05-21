@@ -67,6 +67,17 @@ public class UserValidator {
         validatePhone(userDTO.getPhone());
     }
 
+    public void validateEmailIsUniqueExcludingSelf(String email, Long userIdToExclude) {
+        boolean emailExists = userAccountRepository.existsByAccessCredentials_Email(email);
+        if (emailExists) {
+            userAccountRepository.findByAccessCredentialsEmail(email)
+                    .filter(user -> !user.getUserId().equals(userIdToExclude))
+                    .ifPresent(user -> {
+                        throw new InvalidDataException("El email ya está en uso");
+                    });
+        }
+    }
+
     private void validateUserName(String userName) {
         if (userName == null || userName.isBlank()) {
             throw new InvalidDataException("El nombre es obligatorio");
