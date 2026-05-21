@@ -15,6 +15,8 @@ public class UserValidator {
     private static final int MIN_PASSWORD_LENGTH = 8;
     private static final int PHONE_NUMBER_LENGTH = 10;
     private static final String PHONE_NUMBER_REGEX = "\\d+";
+    private static final int MAX_USER_NAME_LENGTH = 100;
+    private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
 
     private final UserAccountRepository userAccountRepository;
 
@@ -59,8 +61,39 @@ public class UserValidator {
         if (userDTO == null) {
             throw new InvalidDataException("El usuario no puede ser nulo.");
         }
+        validateUserName(userDTO.getUserName());
+        validateEmail(userDTO.getEmail());
         validatePassword(userDTO.getPassword());
         validatePhone(userDTO.getPhone());
+    }
+
+    public void validateEmailIsUniqueExcludingSelf(String email, Long userIdToExclude) {
+        boolean emailExists = userAccountRepository.existsByAccessCredentials_Email(email);
+        if (emailExists) {
+            userAccountRepository.findByAccessCredentialsEmail(email)
+                    .filter(user -> !user.getUserId().equals(userIdToExclude))
+                    .ifPresent(user -> {
+                        throw new InvalidDataException("El email ya está en uso");
+                    });
+        }
+    }
+
+    private void validateUserName(String userName) {
+        if (userName == null || userName.isBlank()) {
+            throw new InvalidDataException("El nombre es obligatorio");
+        }
+        if (userName.length() > MAX_USER_NAME_LENGTH) {
+            throw new InvalidDataException("El nombre no puede exceder 100 caracteres");
+        }
+    }
+
+    private void validateEmail(String email) {
+        if (email == null || email.isBlank()) {
+            throw new InvalidDataException("El correo electrónico es obligatorio");
+        }
+        if (!email.matches(EMAIL_REGEX)) {
+            throw new InvalidDataException("El correo electrónico no tiene un formato válido");
+        }
     }
 
     private void validatePassword(String password) {

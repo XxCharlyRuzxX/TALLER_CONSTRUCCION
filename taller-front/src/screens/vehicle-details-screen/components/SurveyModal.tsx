@@ -1,12 +1,9 @@
 import React from "react";
-import {
-  Box,
-  Typography,
-  Modal,
-  Button,
-  TextField,
-} from "@mui/material";
-import { Rating } from "@mui/lab";
+import { X, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { toast } from "sonner";
 
 interface SurveyModalProps {
   open: boolean;
@@ -20,7 +17,7 @@ const SurveyModal: React.FC<SurveyModalProps> = ({ open, onClose, onSubmit }) =>
 
   const handleSubmit = () => {
     if (!rating) {
-      alert("Por favor, selecciona una calificación.");
+      toast.warning("Por favor, selecciona una calificacion.");
       return;
     }
     onSubmit(rating, feedback);
@@ -29,75 +26,72 @@ const SurveyModal: React.FC<SurveyModalProps> = ({ open, onClose, onSubmit }) =>
     onClose();
   };
 
+  if (!open) {
+    return null;
+  }
+
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      aria-labelledby="modal-title"
-      aria-describedby="modal-description"
-    >
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: 400,
-          bgcolor: "background.paper",
-          border: "2px solid #000",
-          boxShadow: 24,
-          p: 4,
-          borderRadius: "8px",
-        }}
-      >
-        <Typography id="modal-title" variant="h6" sx={{ mb: 2 }}>
-          Encuesta de Satisfacción
-        </Typography>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
-        <Typography id="modal-description" sx={{ mb: 2 }}>
-          Por favor, califica tu experiencia:
-        </Typography>
-
-        <Rating
-          name="simple-controlled"
-          value={rating}
-          onChange={(_event, newValue) => {
-            setRating(newValue);
-          }}
-          size="large"
-          sx={{ mb: 2 }}
-        />
-
-        <TextField
-          label="Comentarios adicionales"
-          multiline
-          rows={4}
-          variant="outlined"
-          fullWidth
-          value={feedback}
-          onChange={(e) => setFeedback(e.target.value)}
-        />
-
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            mt: 3,
-          }}
-        >
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={onClose}
-          >
-            Cancelar
+      <Card className="relative z-10 w-full max-w-md py-0">
+        <CardHeader className="flex flex-row items-start justify-between gap-3 border-b py-5">
+          <div>
+            <CardTitle>Encuesta de satisfaccion</CardTitle>
+            <CardDescription>Califica tu experiencia con el servicio.</CardDescription>
+          </div>
+          <Button type="button" variant="ghost" size="icon" onClick={onClose}>
+            <X className="h-4 w-4" />
           </Button>
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Enviar
-          </Button>
-        </Box>
-      </Box>
-    </Modal>
+        </CardHeader>
+
+        <CardContent className="space-y-5 p-5">
+          <Field>
+            <FieldLabel>Calificacion</FieldLabel>
+            <div className="flex gap-2">
+              {Array.from({ length: 5 }, (_, index) => {
+                const value = index + 1;
+                const selected = (rating ?? 0) >= value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setRating(value)}
+                    className="rounded-md border p-2 transition hover:scale-105"
+                    aria-label={`Calificacion ${value}`}
+                  >
+                    <Star
+                      className={`h-5 w-5 ${selected ? "fill-yellow-400 text-yellow-500" : "text-muted-foreground"}`}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="survey-feedback">Comentarios adicionales</FieldLabel>
+            <textarea
+              id="survey-feedback"
+              rows={4}
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring min-h-24 w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
+              placeholder="Comparte como fue tu experiencia"
+            />
+          </Field>
+
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancelar
+            </Button>
+            <Button type="button" onClick={handleSubmit}>
+              Enviar encuesta
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

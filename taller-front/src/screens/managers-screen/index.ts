@@ -1,1 +1,1 @@
-export * from './MaintenancesProcessScreen';
+export {};
