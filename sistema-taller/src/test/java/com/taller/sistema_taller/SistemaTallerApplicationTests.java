@@ -8,6 +8,7 @@ import com.taller.sistema_taller.service.user_service.user_validations.UserValid
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,6 +22,10 @@ class SistemaTallerApplicationTests {
     @Autowired
     private UserValidator userValidator;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+
     @Test
     void testRegisterAndFindUserById() {
         UserDTO testUser = new UserDTO();
@@ -29,7 +34,7 @@ class SistemaTallerApplicationTests {
         testUser.setEmail("usuario@prueba.com");
         testUser.setPassword("password123456");
 
-        UserService userService = new UserService(userAccountRepository, userValidator);
+        UserService userService = new UserService(userAccountRepository, userValidator, passwordEncoder);
 
         UserAccount savedUser = userService.registerUser(testUser, "CLIENT");
 

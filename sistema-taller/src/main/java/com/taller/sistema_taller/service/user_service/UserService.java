@@ -2,7 +2,7 @@ package com.taller.sistema_taller.service.user_service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.taller.sistema_taller.dto.LoginDTO;
@@ -22,17 +22,19 @@ public class UserService implements UserServiceInterface {
 
     private final UserAccountRepository userAccountRepository;
     private final UserValidator userValidator;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public UserService(UserAccountRepository userAccountRepository, UserValidator userValidator) {
+    public UserService(UserAccountRepository userAccountRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
         this.userAccountRepository = userAccountRepository;
         this.userValidator = userValidator;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     @Transactional
     public UserAccount registerUser(UserDTO userDto, String userType) {
         userValidator.validateRegisterData(userDto, userType);
+        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
         UserAccount newUser = createUserByType(userType, userDto);
         return userAccountRepository.save(newUser);
     }
@@ -62,8 +64,7 @@ public class UserService implements UserServiceInterface {
     @Override
     public UserAccount authenticateUser(LoginDTO loginDto) {
         return userAccountRepository.findByAccessCredentialsEmail(loginDto.getEmail())
-                .filter(user -> user.getAccessCredentials().validateCredentials(loginDto.getEmail(),
-                        loginDto.getPassword()))
+                .filter(user -> passwordEncoder.matches(loginDto.getPassword(), user.getAccessCredentials().getPassword()))
                 .orElseThrow(() -> new UserNotFoundException("El email o la contraseña son incorrectos."));
     }
 
@@ -95,7 +96,7 @@ public class UserService implements UserServiceInterface {
         existingUser.setUserName(userDto.getUserName());
         existingUser.setUserPhone(userDto.getPhone());
         existingUser.getAccessCredentials().setEmail(userDto.getEmail());
-        existingUser.getAccessCredentials().setPassword(userDto.getPassword());
+        existingUser.getAccessCredentials().setPassword(passwordEncoder.encode(userDto.getPassword()));
     }
 
     private UserAccount createUserByType(String userType, UserDTO userDto) {
